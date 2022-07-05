@@ -1,0 +1,1314 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>IWM Music Maker 1.05</title>
+    <style>
+        html {
+            background: #FFFFFF;
+            font-family: 'Arial', serif;
+            -webkit-font-smoothing: antialiased;
+            line-height: 24px;
+        }
+
+        body {
+            padding: 10px;
+        }
+
+        .beatImg {
+            cursor: pointer;
+            border: 1px solid #FFFFFF;
+        }
+
+            .beatImg:hover {
+                border: 1px solid #000000;
+            }
+
+        .whiteKey {
+            position: absolute;
+            border: 1px solid #000000;
+            background-color: #FFFFFF;
+            z-index: 1;
+        }
+
+            .whiteKey:hover {
+                border: 1px solid #FF0000;
+            }
+
+            .whiteKey:active {
+                background-color: #FF7F7F;
+            }
+
+        .blackKey {
+            position: absolute;
+            border: 1px solid #000000;
+            background-color: #000000;
+            z-index: 2;
+        }
+
+            .blackKey:hover {
+                border: 1px solid #FF0000;
+            }
+
+            .blackKey:active {
+                background-color: #FF7F7F;
+            }
+
+        #table > tr > th {
+            font-weight: 100;
+        }
+
+        #table:first-child {
+            font-weight: 400;
+        }
+    </style>
+    <script>
+
+        var beatFrame = 24;
+
+        var pianoHeight = 200;
+        var keyWidth = 30;
+        var blackKeyWidth = 20;
+        var blackKeyHeight = 124;
+        var blackMargin = [
+            keyWidth * 0.61,
+            keyWidth * 0.71,
+            0,
+            keyWidth * 0.58,
+            keyWidth * 0.66,
+            keyWidth * 0.74,
+            0
+        ];
+
+
+
+        var sharpExist = [1, 1, 0, 1, 1, 1, 0, 1];
+        var flatExist = [0, 1, 1, 0, 1, 1, 1, 0];
+
+        var loopMusic = 0;
+
+        var instrument = 0; // 0 : piano
+        var adjust = [];
+        adjust[0] = 1; // 0 : piano
+        adjust[1] = 1;
+
+        var eInstrument;
+        var eBeatLeft;
+        var eBeatRight;
+        var instrumentToText = [];
+        instrumentToText[0] = 'piano';
+        instrumentToText[1] = 'rest';
+        instrumentToText[2] = 'guitar';
+        instrumentToText[3] = 'ok';
+        instrumentToText[4] = 'honk';
+        instrumentToText[5] = 'duck';
+        instrumentToText[6] = 'bell';
+        instrumentToText[7] = 'idk';
+        var pitchToText = [];
+        pitchToText[0] = 'C';
+        pitchToText[1] = 'D';
+        pitchToText[2] = 'E';
+        pitchToText[3] = 'F';
+        pitchToText[4] = 'G';
+        pitchToText[5] = 'A';
+        pitchToText[6] = 'B';
+        var instrumentToInnerCode = [];
+        instrumentToInnerCode[0] = 18;
+        instrumentToInnerCode[1] = 0; // rest
+        instrumentToInnerCode[2] = 19;
+        instrumentToInnerCode[3] = 8;
+        instrumentToInnerCode[4] = 7;
+        instrumentToInnerCode[5] = 0;
+        instrumentToInnerCode[6] = 4;
+        instrumentToInnerCode[7] = 20;
+        var multiplier = [];
+        multiplier[0] = 1;
+        multiplier[1] = 1;
+        multiplier[2] = 1;
+        multiplier[3] = 1;
+        multiplier[4] = 1;
+        multiplier[5] = 1;
+        multiplier[6] = 1;
+        multiplier[7] = 1;
+        multiplier[8] = 1;
+        multiplier[9] = 1;
+        var startDelay = [];
+        startDelay[0] = 0;
+        startDelay[1] = 0;
+        startDelay[2] = 0;
+        startDelay[3] = 0;
+        startDelay[4] = 0;
+        startDelay[5] = 0;
+        startDelay[6] = 0;
+        startDelay[7] = 1.2;
+        startDelay[8] = 0;
+        startDelay[9] = 0;
+        var bias = [];
+        bias[0] = 0;
+        bias[1] = 0;
+        bias[2] = 0;
+        bias[3] = 0;
+        bias[4] = 0;
+        bias[5] = 0;
+        bias[6] = 0;
+        bias[7] = 4;
+        bias[8] = 0;
+        bias[9] = 0;
+
+        var eMode;
+
+        resetConfirm = 0;
+
+
+
+        onload = main;
+        function main() {
+
+            refreshBPF();
+
+            createPiano();
+            document.body.addEventListener("keydown", function (e) {
+                setTimeout(function () {
+                    keyDown(e);
+                }, 1);
+            });
+
+            document.getElementById('pianoMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('pianoStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('pianoBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('guitarMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('guitarStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('guitarBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('okMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('okStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('okBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('honkMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('honkStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('honkBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('duckMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('duckStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('duckBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('bellMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('bellStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('bellBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('idkMultiplier').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('idkStartDelay').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('idkBias').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+
+            document.getElementById('comment').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+
+            window.eInstrument = document.getElementById('instrument');
+            window.eBeatLeft = document.getElementById('valueLeft');
+            window.eBeatRight = document.getElementById('valueRight');
+            window.eMode = document.getElementById('mode');
+
+            document.getElementById('bpf').addEventListener('keydown', function (e) {
+                setTimeout(function () {
+                    refreshBPF();
+                }, 1);
+                e.stopPropagation();
+            });
+
+            document.getElementById('valueLeft').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+            document.getElementById('valueRight').addEventListener('keydown', function (e) {
+                e.stopPropagation();
+            });
+
+            var beatLeft = [4, 2, 1, 1, 1, 3, 3, 3, 3, 1];
+            var beatRight = [1, 1, 1, 2, 4, 1, 2, 4, 8, 1];
+            var cnt = 0;
+            var c = document.getElementById('beatImg').childNodes;
+            for (var i = 0; i < c.length; i++) {
+                if (c[i].nodeType == Node.ELEMENT_NODE) {
+                    c[i].setAttribute('class', 'beatImg');
+                    (function (cCnt) {
+                        c[i].addEventListener('click', function (e) {
+                            document.getElementById('valueLeft').value = beatLeft[cCnt];
+                            document.getElementById('valueRight').value = beatRight[cCnt];
+                        });
+                    })(cnt);
+                    cnt++;
+                }
+            }
+
+            updateTable();
+
+            document.getElementById('deleteLast').addEventListener('click', function () {
+                if (noteSize > 0) {
+                    deleteNote(noteSize - 1, -1);
+                }
+            });
+            document.getElementById('delete1Button').addEventListener('click', function () {
+                deleteNote(c1, -1);
+            });
+            document.getElementById('delete2Button').addEventListener('click', function () {
+                deleteNote(c1, c2);
+            });
+            document.getElementById('cutButton').addEventListener('click', function () {
+                cutNote();
+            });
+            document.getElementById('copyButton').addEventListener('click', function () {
+                copyNote();
+            });
+            document.getElementById('pasteButton').addEventListener('click', function () {
+                pasteNote();
+            });
+            document.getElementById('modifyInstrumentButton').addEventListener('click', function () {
+                var n1, n2;
+
+                if (c1 < 0 || c2 < 0 || c1 >= noteSize || c2 >= noteSize) {
+                    return;
+                }
+
+                if (c1 < c2) {
+                    n1 = c1;
+                    n2 = c2;
+                } else {
+                    n1 = c2;
+                    n2 = c1;
+                }
+
+                var instrument = Number(eInstrument.options[eInstrument.selectedIndex].value);
+
+                while (n1 <= n2) {
+                    if (noteList[n1].instrument != 1) {
+                        noteList[n1].instrument = instrument;
+                    }
+                    
+                    n1++;
+                }
+
+                updateTable();
+            });
+            document.getElementById('modifyBeatButton').addEventListener('click', function () {
+                var n1, n2;
+
+                if (c1 < 0 || c2 < 0 || c1 >= noteSize || c2 >= noteSize) {
+                    return;
+                }
+
+                if (c1 < c2) {
+                    n1 = c1;
+                    n2 = c2;
+                } else {
+                    n1 = c2;
+                    n2 = c1;
+                }
+
+                var left = parseInt(document.getElementById('valueLeft').value);
+                var right = parseInt(document.getElementById('valueRight').value);
+
+                while (n1 <= n2) {
+                    noteList[n1].delayLeft = left;
+                    noteList[n1].delayRight = right
+                    n1++;
+                }
+
+                updateTable();
+            });
+
+            document.getElementById('exportButton').addEventListener('click', function () {
+                createText();
+                document.getElementById('export').style.display = 'block';
+            });
+
+            document.addEventListener('click', function () {
+                resetConfirm = 0;
+                document.getElementById('resetAll').value = 'reset all';
+            });
+            document.getElementById('resetAll').addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (resetConfirm == 0) {
+                    if (noteSize == 0) {
+                        return;
+                    }
+                    resetConfirm = 1;
+                    document.getElementById('resetAll').value = 'really?';
+                } else {
+                    resetTable();
+                    document.getElementById('resetAll').value = 'reset all';
+                }
+
+            });
+
+        }
+
+        function refreshBPF() {
+            bpf = Number(document.getElementById('bpf').value);
+            if (!isNaN(bpf) && 0 < bpf && bpf < 1000) {
+                bpf = parseInt(bpf);
+                beatFrame = bpf;
+                document.getElementById('bpf').value = bpf;
+                document.getElementById('bpm').textContent = '';
+                document.getElementById('bpm').style.color = '#000000';
+                document.getElementById('bpm').style.fontWeight = 'normal';
+            } else {
+                beatFrame = -1;
+                document.getElementById('bpm').textContent = '(1-999 integer needed, multiple of 6 is recommended.)';
+                document.getElementById('bpm').style.color = '#DD0000';
+                document.getElementById('bpm').style.fontWeight = 'bold';
+            }
+        }
+
+        function refreshOption() {
+
+            var n;
+
+            n = Number(document.getElementById('pianoMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[0] = n;
+            }
+
+            n = Number(document.getElementById('pianoStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[0] = n;
+            } else {
+                document.getElementById('pianoStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('pianoBias').value);
+            if (!isNaN(n)) {
+                bias[0] = n;
+            } else {
+                document.getElementById('pianoBias').value = '0';
+            }
+
+
+
+            n = Number(document.getElementById('guitarMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[2] = n;
+            }
+
+            n = Number(document.getElementById('guitarStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[2] = n;
+            } else {
+                document.getElementById('guitarStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('guitarBias').value);
+            if (!isNaN(n)) {
+                bias[2] = n;
+            } else {
+                document.getElementById('guitarBias').value = '0';
+            }
+
+
+
+            n = Number(document.getElementById('okMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[3] = n;
+            }
+
+            n = Number(document.getElementById('okStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[3] = n;
+            } else {
+                document.getElementById('okStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('okBias').value);
+            if (!isNaN(n)) {
+                bias[3] = n;
+            } else {
+                document.getElementById('okBias').value = '0';
+            }
+
+
+
+            n = Number(document.getElementById('honkMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[4] = n;
+            }
+
+            n = Number(document.getElementById('honkStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[4] = n;
+            } else {
+                document.getElementById('honkStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('honkBias').value);
+            if (!isNaN(n)) {
+                bias[4] = n;
+            } else {
+                document.getElementById('honkBias').value = '0';
+            }
+
+
+
+            n = Number(document.getElementById('duckMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[5] = n;
+            }
+
+            n = Number(document.getElementById('duckStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[5] = n;
+            } else {
+                document.getElementById('duckStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('duckBias').value);
+            if (!isNaN(n)) {
+                bias[5] = n;
+            } else {
+                document.getElementById('duckBias').value = '0';
+            }
+
+
+
+            n = Number(document.getElementById('bellMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[6] = n;
+            }
+
+            n = Number(document.getElementById('bellStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[6] = n;
+            } else {
+                document.getElementById('bellStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('bellBias').value);
+            if (!isNaN(n)) {
+                bias[6] = n;
+            } else {
+                document.getElementById('bellBias').value = '0';
+            }
+
+
+
+            n = Number(document.getElementById('idkMultiplier').value);
+            if (!isNaN(n) && n > 0) {
+                multiplier[7] = n;
+            }
+
+            n = Number(document.getElementById('idkStartDelay').value);
+            if (!isNaN(n) && n >= 0) {
+                startDelay[7] = n;
+            } else {
+                document.getElementById('idkStartDelay').value = '0';
+            }
+
+            n = Number(document.getElementById('idkBias').value);
+            if (!isNaN(n)) {
+                bias[7] = n;
+            } else {
+                document.getElementById('idkBias').value = '0';
+            }
+
+        }
+
+        function createPiano() {
+
+            var i, j;
+
+            var backward = 23;
+            var forward = 11;
+
+            var keyCode = 0 - Math.floor(backward / 7) * 12;
+            i = backward % 7;
+            while (i < 7) {
+                keyCode -= sharpExist[i];
+                i++;
+            }
+
+            var note = (700000 - backward) % 7;
+            var key = 0 - backward;
+            var keyLeft = forward + backward + 1;
+
+            var ePiano = document.getElementById('piano');
+            ePiano.style.height = window.pianoHeight.toString(10) + 'px';
+
+            var marginLeft = 20;
+            while (true) {
+
+                keyLeft--;
+
+                var eKey = document.createElement('DIV');
+                eKey.style.width = keyWidth + 'px';
+                eKey.style.height = pianoHeight + 'px';
+                eKey.style.left = marginLeft + 'px';
+                eKey.setAttribute('key', key.toString(10));
+                eKey.setAttribute('mode', '0');
+                eKey.setAttribute('class', 'whiteKey');
+                (function (cKey, cKeyCode) {
+                    eKey.addEventListener('click', function () {
+                        addTable(cKey, 0, cKeyCode);
+                    });
+                })(key, keyCode);
+                ePiano.appendChild(eKey);
+
+                if (window.blackMargin[note] > 0 && keyLeft > 0) {
+
+                    var eBlackKey = document.createElement('DIV');
+                    eBlackKey.style.left = (marginLeft + window.blackMargin[note]) + 'px';
+                    eBlackKey.style.width = window.blackKeyWidth + 'px';
+                    eBlackKey.style.height = window.blackKeyHeight + 'px';
+                    eBlackKey.setAttribute('key', key.toString(10));
+                    eBlackKey.setAttribute('mode', '1');
+                    eBlackKey.setAttribute('class', 'blackKey');
+                    (function (cKey, cKeyCode) {
+                        eBlackKey.addEventListener('click', function () {
+                            addTable(cKey, 1, cKeyCode + 1);
+                        });
+                    })(key, keyCode);
+                    ePiano.appendChild(eBlackKey);
+
+                }
+
+                marginLeft += window.keyWidth;
+
+                key++;
+                keyCode++;
+                if (sharpExist[note % 7] != 0) {
+                    keyCode++;
+                }
+                note++;
+                note %= 7;
+
+                if (keyLeft <= 0) {
+                    break;
+                }
+            }
+
+        }
+
+        function keyDown(e) {
+            refreshBPF();
+            if (48 <= e.keyCode && e.keyCode <= 57) { // 1~10
+                var left = parseInt(document.getElementById('valueLeft').value);
+                var right = parseInt(document.getElementById('valueRight').value);
+
+                if (e.keyCode == 49) { // 1
+                    document.getElementById('valueLeft').value = '4';
+                    document.getElementById('valueRight').value = '1';
+                } else if (e.keyCode == 50) {
+                    document.getElementById('valueLeft').value = '2';
+                    document.getElementById('valueRight').value = '1';
+                } else if (e.keyCode == 51) {
+                    document.getElementById('valueLeft').value = '1';
+                    document.getElementById('valueRight').value = '1';
+                } else if (e.keyCode == 52) {
+                    document.getElementById('valueLeft').value = '1';
+                    document.getElementById('valueRight').value = '2';
+                } else if (e.keyCode == 53) {
+                    document.getElementById('valueLeft').value = '1';
+                    document.getElementById('valueRight').value = '4';
+                } else if (e.keyCode == 54) {
+                    document.getElementById('valueLeft').value = '3';
+                    document.getElementById('valueRight').value = '1';
+                } else if (e.keyCode == 55) {
+                    document.getElementById('valueLeft').value = '3';
+                    document.getElementById('valueRight').value = '2';
+                } else if (e.keyCode == 56) {
+                    document.getElementById('valueLeft').value = '3';
+                    document.getElementById('valueRight').value = '4';
+                } else if (e.keyCode == 57) {
+                    document.getElementById('valueLeft').value = '3';
+                    document.getElementById('valueRight').value = '8';
+                }
+            }
+        }
+
+        var c1 = -1;
+        var c2 = -1;
+
+        var clipboardList = [];
+        var clipboardSize = 0;
+
+        var noteList = [];
+        var noteSize = 0;
+
+        // 음 높이(흰색 건반만)
+        // 0: 일반 노트, 1: 샾 있음, 2: 쉼표
+        // 음의 코드,
+        function addTable(key, mode, keyCode) {
+
+            var i, j;
+
+            if (noteSize == 0) {
+                c1 = 0;
+                c2 = 0;
+            }
+
+            var left = new Number(window.eBeatLeft.value);
+            var right = new Number(window.eBeatRight.value);
+
+            if (isNaN(left) || isNaN(right)) {
+                return;
+            }
+            left = parseInt(left);
+            right = parseInt(right);
+            if (left < 0 || right <= 0) {
+                return;
+            }
+
+            var cMode = Number(eMode.options[eMode.selectedIndex].value); // insert position
+            var cInstrument = Number(eInstrument.options[eInstrument.selectedIndex].value);
+            if (mode == 2) { // 쉼표
+                cInstrument = 1;
+            }
+
+            if (cMode == 0) {
+
+                noteList[noteSize] = {};
+
+                noteList[noteSize].pitch = keyCode;
+                key += 28;
+                noteList[noteSize].pitchText = pitchToText[key % 7];
+                if (mode == 1) {
+                    noteList[noteSize].pitchText += '#';
+                }
+                noteList[noteSize].pitchText += Math.floor(key / 7).toString(10);
+
+                noteList[noteSize].instrument = cInstrument;
+                noteList[noteSize].delayLeft = left;
+                noteList[noteSize].delayRight = right;
+                noteList[noteSize].comment = document.getElementById('comment').value;
+                noteSize++;
+
+            } else if (cMode == 1) {
+
+                i = noteSize - 1;
+                while (i >= 0) {
+                    noteList[i + 1] = noteList[i];
+                    i--;
+                }
+                noteSize++;
+
+                noteList[0] = {};
+
+                noteList[0].pitch = keyCode;
+                key += 28;
+                noteList[0].pitchText = pitchToText[key % 7];
+                if (mode == 1) {
+                    noteList[0].pitchText += '#';
+                }
+                noteList[0].pitchText += Math.floor(key / 7).toString(10);
+
+                noteList[0].instrument = cInstrument;
+                noteList[0].delayLeft = left;
+                noteList[0].delayRight = right;
+                noteList[0].comment = document.getElementById('comment').value;
+
+            } else if (cMode == 2) { // insert at c1
+
+                if (noteSize == 0) {
+
+                    noteList[0] = {};
+
+                    noteList[0].pitch = keyCode;
+                    key += 28;
+                    noteList[0].pitchText = pitchToText[key % 7];
+                    if (mode == 1) {
+                        noteList[0].pitchText += '#';
+                    }
+                    noteList[0].pitchText += Math.floor(key / 7).toString(10);
+
+                    noteList[0].instrument = cInstrument;
+                    noteList[0].delayLeft = left;
+                    noteList[0].delayRight = right;
+                    noteList[0].comment = document.getElementById('comment').value;
+
+                    c1 = 0;
+                    noteSize = 1;
+
+                    updateTable();
+                    return;
+                } else {
+
+                    i = noteSize - 1;
+                    while (i >= c1) {
+                        noteList[i + 1] = noteList[i];
+                        i--;
+                    }
+                    noteSize++;
+
+                    noteList[c1] = {};
+
+                    noteList[c1].pitch = keyCode;
+                    key += 28;
+                    noteList[c1].pitchText = pitchToText[key % 7];
+                    if (mode == 1) {
+                        noteList[c1].pitchText += '#';
+                    }
+                    noteList[c1].pitchText += Math.floor(key / 7).toString(10);
+
+                    noteList[c1].instrument = cInstrument;
+                    noteList[c1].delayLeft = left;
+                    noteList[c1].delayRight = right;
+                    noteList[c1].comment = document.getElementById('comment').value;
+                    c1++;
+
+                }
+
+            } else if (cMode == 3) { // modify c1
+
+                if (noteSize == 0) {
+                    return;
+                } else {
+
+                    noteList[c1] = {};
+
+                    noteList[c1].pitch = keyCode;
+                    key += 28;
+                    noteList[c1].pitchText = pitchToText[key % 7];
+                    if (mode == 1) {
+                        noteList[c1].pitchText += '#';
+                    }
+                    noteList[c1].pitchText += Math.floor(key / 7).toString(10);
+
+                    noteList[c1].instrument = cInstrument;
+                    noteList[c1].delayLeft = left;
+                    noteList[c1].delayRight = right;
+                    noteList[c1].comment = document.getElementById('comment').value;
+
+                }
+
+            } else {
+                return;
+            }
+
+            updateTable();
+        }
+
+        function resetTable() {
+            window.noteSize = 0;
+
+            updateTable();
+        }
+
+        function updateTable() {
+
+            var eTable = document.getElementById('table');
+            eTable.textContent = '';
+
+            var eTR = document.createElement('TR');
+            var eTH;
+
+            eTH = document.createElement('TH');
+            eTH.style.width = '30px';
+            eTH.style.fontWeight = '900';
+            eTH.textContent = 'c1';
+            eTR.appendChild(eTH);
+
+            eTH = document.createElement('TH');
+            eTH.style.width = '30px';
+            eTH.style.fontWeight = '900';
+            eTH.textContent = 'c2';
+            eTR.appendChild(eTH);
+
+            eTH = document.createElement('TH');
+            eTH.style.width = '60px';
+            eTH.style.fontWeight = '900';
+            eTH.textContent = 'inst.';
+            eTR.appendChild(eTH);
+
+            eTH = document.createElement('TH');
+            eTH.style.width = '60px';
+            eTH.style.fontWeight = '900';
+            eTH.textContent = 'pitch';
+            eTR.appendChild(eTH);
+
+            eTH = document.createElement('TH');
+            eTH.style.width = '130px';
+            eTH.style.fontWeight = '900';
+            eTH.textContent = 'delay(beats)';
+            eTR.appendChild(eTH);
+
+            eTH = document.createElement('TH');
+            eTH.style.width = '400px';
+            eTH.style.fontWeight = '900';
+            eTH.textContent = 'comment';
+            eTR.appendChild(eTH);
+
+            eTable.appendChild(eTR);
+
+            var eRadio;
+
+            var i;
+            for (i = 0; i < window.noteSize; i++) {
+                eTR = document.createElement('TR');
+                eTH = document.createElement('TH');
+                eTH.style.width = '30px'
+
+                eRadio = document.createElement('INPUT');
+                eRadio.setAttribute('type', 'radio');
+                eRadio.setAttribute('name', 'c1');
+                if (i == c1) {
+                    eRadio.setAttribute('checked', 'true');
+                }
+                (function (n) {
+                    eRadio.addEventListener('click', function () {
+                        c1 = n;
+                    });
+                })(i);
+                eTH.appendChild(eRadio);
+
+                eTR.appendChild(eTH);
+
+                eTH = document.createElement('TH');
+                eTH.style.width = '30px'
+                eRadio = document.createElement('INPUT');
+                eRadio.setAttribute('type', 'radio');
+                eRadio.setAttribute('name', 'c2');
+                if (i == c2) {
+                    eRadio.setAttribute('checked', 'true');
+                }
+                (function (n) {
+                    eRadio.addEventListener('click', function () {
+                        c2 = n;
+                    });
+                })(i);
+                eTH.appendChild(eRadio);
+                eTR.appendChild(eTH);
+
+                eTH = document.createElement('TH');
+                eTH.style.width = '60px'
+                eTH.textContent = instrumentToText[noteList[i].instrument];
+                eTR.appendChild(eTH);
+
+                eTH = document.createElement('TH');
+                eTH.style.width = '60px'
+                if (noteList[i].instrument != 1) {
+                    eTH.textContent = noteList[i].pitchText;
+                } else {
+                    eTH.textContent = '';
+                }
+                eTR.appendChild(eTH);
+
+                eTH = document.createElement('TH');
+                eTH.style.width = '130px'
+                eTH.textContent = noteList[i].delayLeft + '/' + noteList[i].delayRight;
+                eTR.appendChild(eTH);
+
+                eTH = document.createElement('TH');
+                eTH.style.width = '400px'
+                eTH.textContent = noteList[i].comment;
+                eTR.appendChild(eTH);
+
+                eTable.appendChild(eTR);
+            }
+        }
+
+        function deleteNote(n1, n2) {
+
+            var i, j;
+
+            if (n1 >= noteSize || n2 >= noteSize || n1 < 0) {
+                return;
+            }
+
+            if (n2 < 0 || n2 === undefined || n1 == n2) {
+                for (i = n1 + 1; i < noteSize; i++) {
+                    noteList[i - 1] = noteList[i];
+                }
+                noteSize--;
+                if (c1 >= noteSize) {
+                    c1 = noteSize - 1;
+                }
+                if (c2 >= noteSize) {
+                    c2 = noteSize - 1;
+                }
+            } else {
+
+                if (n1 > n2) {
+                    i = n1;
+                    n1 = n2;
+                    n2 = i;
+                }
+
+                j = n2 - n1 + 1;
+                for (i = n2 + 1; i < noteSize; i++) {
+                    noteList[i - j] = noteList[i];
+                }
+                noteSize -= j;
+                if (c1 >= noteSize) {
+                    c1 = noteSize - 1;
+                }
+                if (c2 >= noteSize) {
+                    c2 = noteSize - 1;
+                }
+            }
+
+            updateTable();
+        }
+
+        function copyNote() {
+
+            var i, j;
+
+            if (c1 < 0 || c2 < 0 || c1 >= noteSize || c2 >= noteSize) {
+                return;
+            }
+
+            var n1 = c1;
+            var n2 = c2;
+
+            if (n1 > n2) {
+                i = n1;
+                n1 = n2;
+                n2 = i;
+            }
+
+            j = 0;
+            for (i = n1; i <= n2; i++) {
+                clipboardList[j] = {};
+                clipboardList[j].instrument = noteList[i].instrument;
+                clipboardList[j].pitch = noteList[i].pitch;
+                clipboardList[j].pitchText = noteList[i].pitchText;
+                clipboardList[j].delayLeft = noteList[i].delayLeft;
+                clipboardList[j].delayRight = noteList[i].delayRight;
+                clipboardList[j].comment = noteList[i].comment;
+                j++;
+            }
+            clipboardSize = n2 - n1 + 1;
+
+        }
+
+        function cutNote() {
+
+            if (c1 < 0 || c2 < 0 || c1 >= noteSize || c2 >= noteSize) {
+                return;
+            }
+            copyNote();
+            deleteNote(c1, c2);
+        }
+
+        function pasteNote() {
+
+            var i, j;
+
+            if (clipboardSize == 0) {
+                return;
+            }
+
+            if (noteSize == 0) {
+                for (i = 0; i < clipboardSize; i++) {
+                    noteList[i] = {};
+                    noteList[i].instrument = clipboardList[i].instrument;
+                    noteList[i].pitch = clipboardList[i].pitch;
+                    noteList[i].pitchText = clipboardList[i].pitchText;
+                    noteList[i].delayLeft = clipboardList[i].delayLeft;
+                    noteList[i].delayRight = clipboardList[i].delayRight;
+                    noteList[i].comment = clipboardList[i].comment;
+                }
+                noteSize = clipboardSize;
+                if (noteSize > 0) {
+                    c1 = 0;
+                    c2 = 0;
+                }
+
+                updateTable();
+                return;
+            }
+
+            if (c1 < 0 || c1 >= noteSize) {
+                return;
+            }
+
+            i = noteSize - 1;
+            while (i >= c1) {
+                noteList[i + clipboardSize] = {};
+                noteList[i + clipboardSize].instrument = noteList[i].instrument;
+                noteList[i + clipboardSize].pitch = noteList[i].pitch;
+                noteList[i + clipboardSize].pitchText = noteList[i].pitchText;
+                noteList[i + clipboardSize].delayLeft = noteList[i].delayLeft;
+                noteList[i + clipboardSize].delayRight = noteList[i].delayRight;
+                noteList[i + clipboardSize].comment = noteList[i].comment;
+                i--;
+            }
+            i = c1;
+            j = 0;
+            while (i < c1 + clipboardSize) {
+                noteList[i] = clipboardList[j];
+                i++; j++;
+            }
+            noteSize += clipboardSize;
+
+            updateTable();
+
+        }
+
+        function getGCD(a, b) {
+            var t;
+            if (a < b) {
+                t = a;
+                a = b;
+                b = t;
+            }
+            while (1) {
+                a %= b;
+                if (a == 0) {
+                    return b;
+                }
+                b %= a;
+                if (b == 0) {
+                    return a;
+                }
+            }
+        }
+
+        function createText() {
+
+            refreshOption();
+
+            var halfNote = Math.pow(2, 1 / 12);
+
+            if (beatFrame <= 0) {
+                document.getElementById('result').value = "Error: Input bpm value first.";
+                return;
+            }
+
+            var s = '';
+            s += '<object y="16" x="16" type="1">';
+
+            var frameLeft = 0;
+            var frameRight = 1;
+
+            var i;
+            for (i = 0; i < noteSize; i++) {
+
+                if (noteList[i].instrument != 1) { // rest가 아닌 경우에
+
+                    var cInstrument = noteList[i].instrument;
+
+                    var cPitch = noteList[i].pitch;
+                    var pitchValue = multiplier[cInstrument];
+                    var pitchIndex = cPitch;
+
+                    while (pitchIndex > 0) {
+                        pitchValue *= halfNote; // halfNote = 1.0595...
+                        pitchIndex--;
+                    }
+                    while (pitchIndex < 0) {
+                        pitchValue /= halfNote;
+                        pitchIndex++;
+                    }
+                    pitchValue = Math.round(pitchValue * 10000) / 10000;
+
+                    if (pitchValue < 0.05) {
+                        s = '';
+                        s += "Error: Some note's pitches are out of range(0.05 - 3). Increase multiplier of ";
+                        s += instrumentToText[cInstrument];
+                        s += '.';
+                        document.getElementById('result').value = s;
+                        return;
+                    }
+                    if (pitchValue > 3) {
+                        s = '';
+                        s += 'Error: Some note\'s pitches are out of range(0.05 - 3). Decrease multiplier of ';
+                        s += instrumentToText[cInstrument];
+                        s += '.';
+                        document.getElementById('result').value = s;
+                        return;
+                    }
+
+                    s += '<event eventIndex="17">';
+                    s += '<param val="';
+                    var nextOffset = (frameLeft * beatFrame) / frameRight - startDelay[cInstrument] / pitchValue + bias[cInstrument];
+                    if (nextOffset < 0) {
+                        nextOffset = 0;
+                    } else if (nextOffset > 99999) {
+                        s = '';
+                        s += 'Error: Offset value exceeded';
+                        document.getElementById('result').value = s;
+                        return;
+                    }
+                    s += Math.floor(nextOffset).toString(10);
+                    s += '" key="offset"/>';
+                    s += '<param val="99999" key="frames"/>';
+                    s += '<event eventIndex="104">';
+                    s += '<param val="';
+
+                    s += pitchValue.toString(10);
+
+                    s += '" key="pitch"/>';
+
+                    s += '<param val="';
+                    s += instrumentToInnerCode[cInstrument];
+                    s += '" key="sound"/>';
+
+                    s += '</event>';
+                    s += '</event>';
+                    s += '<param val="1" key="scale"/>';
+                    s += '<param val="0" key="tileset"/>';
+                }
+
+                var gcd = getGCD(frameRight, noteList[i].delayRight);
+                if (gcd > 1000000) {
+                    document.getElementById('result').value = "Error: Denominator is too large.";
+                    return;
+                }
+                if (gcd > frameRight) {
+                    frameLeft *= gcd;
+                    frameLeft /= frameRight;
+                }
+                frameRight = gcd;
+                frameLeft += (noteList[i].delayLeft * gcd) / noteList[i].delayRight;
+
+            }
+
+            s += '</object>';
+
+            if (loopMusic == 1) {
+                var loopTime = (Math.floor((frameLeft * beatFrame) / frameRight)).toString(10);
+                s = s.replace(/99999/g, loopTime);
+            }
+
+            document.getElementById('result').value = s;
+
+        }
+
+        function toggleLoop(e) {
+            if (e.checked) {
+                loopMusic = 1;
+            } else {
+                loopMusic = 0;
+            }
+        }
+
+        function toggleSetting(e) {
+            if (e.checked) {
+                document.getElementById('setting').style.display = 'block';
+            } else {
+                document.getElementById('setting').style.display = 'none';
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div style='display: block '>&nbsp;<div style='float:left'>1 beat: <input id='bpf' type='text' placeholder='24' value='24' size='2' maxlength='3' /> frames&nbsp;</div><div id='bpm' style='float:left'></div></div>
+    <div><label><input type='checkbox' onclick='toggleLoop(this)' />loop music</label></div>
+    <div><label><input type='checkbox' onclick='toggleSetting(this)' />show inner constants</label></div>
+    <div id='setting' style='display:none' ;>
+        Piano multiplier: <input id='pianoMultiplier' type='text' size='5' maxlength='6' value='1' />
+        startDelay: <input id='pianoStartDelay' type='text' size='5' maxlength='6' value='0' />
+        bias: <input id='pianoBias' type='text' size='5' maxlength='6' value='0' /><br />
+        Guitar multiplier: <input id='guitarMultiplier' type='text' size='5' maxlength='6' value='2' />
+        startDelay: <input id='guitarStartDelay' type='text' size='5' maxlength='6' value='0' />
+        bias: <input id='guitarBias' type='text' size='5' maxlength='6' value='0' /><br />
+        OK multiplier: <input id='okMultiplier' type='text' size='5' maxlength='6' value='0.84' />
+        startDelay: <input id='okStartDelay' type='text' size='5' maxlength='6' value='0' />
+        bias: <input id='okBias' type='text' size='5' maxlength='6' value='0' /><br />
+        Honk multiplier: <input id='honkMultiplier' type='text' size='5' maxlength='6' value='0.725' />
+        startDelay: <input id='honkStartDelay' type='text' size='5' maxlength='6' value='2' />
+        bias: <input id='honkBias' type='text' size='5' maxlength='6' value='-0.5' /><br />
+        Duck multiplier: <input id='duckMultiplier' type='text' size='5' maxlength='6' value='0.9439' />
+        startDelay: <input id='duckStartDelay' type='text' size='5' maxlength='6' value='0.5' />
+        bias: <input id='duckBias' type='text' size='5' maxlength='6' value='-0.1' /><br />
+        Bell multiplier: <input id='bellMultiplier' type='text' size='5' maxlength='6' value='0.624' />
+        startDelay: <input id='bellStartDelay' type='text' size='5' maxlength='6' value='0.2' />
+        bias: <input id='bellBias' type='text' size='5' maxlength='6' value='0' /><br />
+        idkLastInstument multiplier: <input id='idkMultiplier' type='text' size='5' maxlength='6' value='0.887' />
+        startDelay: <input id='idkStartDelay' type='text' size='5' maxlength='6' value='4' />
+        bias: <input id='idkBias' type='text' size='5' maxlength='6' value='-1' /><br />
+    </div>
+    <div id='piano' style='padding:20px;'></div>
+    <div>
+        instrument:
+        <select style='font-size:18px;' id='instrument'>
+            <option value='0'>Piano</option>
+            <option value='2'>Guitar</option>
+            <option value='3'>OK</option>
+            <option value='4'>Honk</option>
+            <option value='5'>Duck</option>
+            <option value='6'>Bell</option>
+            <option value='7'>idkLastInstument</option>
+        </select>&nbsp;<input type='button' value='add rest note' onclick='addTable(0, 2, 0)' />
+    </div>
+    <div id='beatImg'>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD+SURBVFhH7ZRBDYVADEQrAQtYQAMWsIAmLGABDVjAAhb4E7YkGzgMbfITDvNOy3RJX7oLdnwMCTEkxJAQQ0IMCTEkxJAQQ0IMCTEkxJAQQ0IMCTEkxJAQIy+0LMs4jl3X2UXbtsMwIPcdKTJC67qidzHAGsm+79M0FS0Ay5InCAuhk7c127bN05N5nr1wknMKC5XZFDyqqE8Qa08jhIW828ltQqA+OOBphPA7TdN4NzO09/QCl8lrZtjpaYSwUH1R0BIGXrjwmhl2ehQhM9XaCReldsJnX/Ln8F6SEQLlO+/7HkMC+CFBBY8A+XNs70kK/Q8JMSTEkBDjY0LH8QNadBmgiI0LnwAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD7SURBVFhH7ZjBDYNADARJKoASgFagBGiBEiiBFqAGWqEFKIEWyIpzPkmk1TkflOx8ONs6eWTfi9txHMmVuNv3MkiIISHGfwjVdW2neLQyhoQYEmJIiCEhhoQYEmJIiCEhhoQYEmL8ltC2bW3bZll2OymKYpomq3nxC3VdV5blPM84D8Owriv8Qv6sezlcNE0Tro/jaKmTfd+RrKrK4ng8QphH6Ir2lnoSRC1w4bmcpikaW/AEclCEzXspCo8Qur7MBotDEuR5/j62KDxCmEF4OnjIWB8GFmw+LjEWjxC69n2PYQQPHKC4LIuVv0O/hRkSYkiIISHGxYSS5AERsSIl7ieumQAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADjSURBVFhH7djhCYJQHARwbQRBv7uCrqAjuIIr6AY6giu4nI5gUkcUWAengdT9vvTg/e0d78IPhcuyBGdywedpOBDjQIwDMccHKssSK8nxgaZpwkpyfKAoirCS/MFvyJV9mStjXBnjyhhXxrgyxpUxroxxZcxvVTbPc9/3eZ6HN0mStG2LPdmi6roOX/EqjmNMSMRAVVXh/C0YkigPv7ubuzRNMSdRAq2l4PAt4zhiTqIEwslbmqbBkEoJlGUZzn+yXtvOu7lTAq2vvrquH8UVRTEMA/Z28//UjAMxDsQ40GdBcAXrsVvXvOXCPwAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAActJREFUaEPtmcGtwjAMhvOe4MYBegepDNADrAAblBVgBLoBjMAKVEwAFwaAC3c6QnvpjQPgyH16VOXxGgcnSPkkq3HTSv5rK3Hg63pHfDDfeP1YnADTOAGmcQJMwyqg1+vhSB+sG1mz2RSXywU9PbCX0G63w5Ee2DMQBIE4Ho94hw57Bk6nk4jjGD067BkAWq2WSJJEdDod6VMwsozmeS5msxl6RCADXDQajQdbLBY4ow6rgMFgcD2fz9fRaPQjYrvd4qwarAIg8AL4+oWINE3xbn2MCQAOh4MUAJlRhb2EyqxWKykCrioYzUAB3H829worutEwDMV+v0evHqwb2XA4fNpGqDZ6rBnwPA9H+rCihCiwCriv9zh6JMsy2aWqYEUJwRlhPB6jVw8rSmiz2YjpdIpePawoIaDf7+OoHlaUEOWAY0UJUbCmhFTRKgCWw+VyKXdc2FkLi6JIzr9jI9PWzP3u76tsMpkoN2x/oUUABFcVdNkoff8zyAJeffnCut0uvqEXsoB2u10ZcNnW6zW+oReygKpgyzafz/Fp/ZAF+L5fGTQYZEf1qPhfyALgF4V7H/MQOKw27w68wP1PbBonwDROgGmcALMIcQPwxRaRh6CRlQAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAddJREFUWEftmMFtwkAQRUlOvoJEAT5zA0qAEmgB6MAlWHQAdEAL0IKhA+QCkKAE54v5rFDi4B17nHDYd4BZ28JPszO7Nh9FUXTeiU9+vw1BqIogVEUQqsJM6HA4DAYDDhpgmaHL5cKoAcZCt9uNg7oY19BqtWJUG+xlJuz3e/nB8/nMQ7Ww77LZbMaoFvZCp9NpsVhwoMdeCGy3281mw4ESY6H5fC7Bcrk8Ho8SqzAWGg6HrrrH43EdJxZ3Y8Sj3+9f78RxjCE+edob4wxhbcRS1O12kRvY5HmuLiaKNcbNFMiyDEeQJyRsMpnIBZ6YCUEiiiIaPZzSNIWTXOCJmRBAMuAh1SNOWLUR8LQflkJoMQncYg2n/xR6Lpf1eg0VyRYP+dGWEJD0uLR5Ytn2aCtGd0ajEYpa/YREMQt+drgocuBHK5urAyskI29anDIg6zUHflgK9Xo9Rg/wKjKdTjnwo90pw16WJAkHnrCWNGBq0D7oZ/kFbA64K45rO7wUtRBUxOMbWJ21+2gpOqHXD/B/LfRbboQaz2KlKIRQK7x5Gbvdjtc1QyHEO5chRW2CQsi11TNIm1VuBIUQuh1vOW7iUMJ4xuA5O8L/1FUEoSqCUBVB6DWdzhfRc5Sp+otv+AAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAElSURBVGhD7ZnRqYNAEEXHVKAlqP9WoSVoC5ZgBWIL2oFgK7agJdhC4l3W9x4PE0gyMAj3wKLrjjJndvza4L4jF+bmr5eFAtZQwBoKvEtRFP5OB+6ANRSwhgLWUMAaClhDAWsoYA0FrKGANRSwhgLWUOA/67pKVVUSRZEEQeBGkiQyDIOP0EVVoK5rSdNUpmly867rZFkWJwWwrg4OODQoyxIHJW70fe+f/rJtm1vL89w/0UFFYK/0T3JI9IxDUBuVL4Zh6BI8A0IQQ/LPYr5BRQDJnVUerYQ1jDiOn+7OOI73tm397D1UBFDZo+/3n9a1FHblSP5VayH5LMtc3CeoCCC5pmlclf9WHGLzPPuoc1D5451P4DGrNRSwhgLWUMCaiwuIPABC1TLCrGOHkAAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAEbSURBVGhD7dnRCYMwFAXQpCMI+u8CfugKOoIruIIuIDqCI+hyOkJqyvND+6REXg3CPfBoCrHk2lv6oTYr9WAven0sBPANAXxDAN9uDVAUBa3k3Bpgnmdaybk1QBAEtJKD34ALVIiBCrlAhRiokAtUiIEKuUCFGKiQC1SIgQq5QIUYqJALVIghHmBZFtX3vcqyTGmtPxNFkWqahnYIsw84pHRdZx+WnE4YhrRTjliAsizZQx9Hmsgn/rrz28RxTFfIEQlgq8Ed+DjTNNEVe+M4mrZt6Z0bkQDcYY9T1zXt3rOHT5Lks+cKkQBpmn4deBv77Zzdecve+W3vFSIB1j8oU1XVrkp5npthGGjH/+A5sW8I4BsC+IYAfin1BuBSnERmGBJQAAAAAElFTkSuQmCC" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAeNJREFUaEPtmcGtwjAMhvOe4MahcC8SDMCBrgAbwAowAl0AwQiMAKgTwIUB4MIdRoALtx766sp9elTto42DE6R8kkWcUMl/bSUOfEUx4oP5xs+PxQrQjRWgGytAN6wC2u02jtTBepDV63URhiF6amAvof1+jyM1sGeg1+uJ0+mEM3TYM3A+n8V2u0WPDnsGgEajIa7Xq2g2m4lPQcs2+ng8xHQ6RY8IZICLWq32ZIvFAlfkYRXQ7/ejy+USDQaDXxG73Q5X5WAVAIGnwNtPRdxuN5ytjjYBwPF4TARAZmRhL6Esq9UqEQGfMmjNQArMF629wohudDQaicPhgF41WA8yz/MK2wjZRo81A61WC0fqMKKEKLAKiPd7HD1zv9+TLlUGI0oI7gjD4RC9ahhRQkEQiMlkgl41jCghoNvt4qgaRpQQ5YJjRAlRMKaEZFEqALbD5XKZnLhwsqbm+36y/o6DTFkz97e/z7PxeCzdsP2HEgEQXF7QWaP0/UWQBbx686m5rotPqIUswHGc3ICzttls8Am1kAXkBZu12WyG3y5mvV5H8/kcvfKQBXQ6ndygwSA7Za6KEHzczMG9BGfKQxYAvyjEfcxT4LDbVLnjwpuH4GUE2P+JdWMF6MYK0I0VoBchfgCK3AZBonnaRgAAAABJRU5ErkJggg==" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAAhFJREFUaEPtmcGNwjAQRWf3xBUkCuCMxAEoAUqghcCZCxUgRAdABdACtABIFAAUgAQlZP2tsYAom0Uex95IedIonkSJ5nvssQ1fsYIKzDdfC0spIDSlgNCUAkKTu4DdbkfNZpM993jJwO1245Z7vAl4PB7sucXbHJjP59xyi1cBl8uFPXd4EwAGgwG33OFVwPF4pOFwyJ4bvAoAq9WKlssle3K8CYiiiFtEo9GIDocDezK8CWi327Tdbtkj6na7bkTgRJYnKmic+OJ6vR7f73dtjUZD38NVircMYDFDKa1Wq7rnVfB0vV7l84GF5IbJgLH9fq/vIxPISq/X074tuWegVqtRpVJh7zn2kYnxeEyn04mfWMJCcgW9jJ43Yx8G/3w+67YELwJUBeJWHKvV+E1EIQQkx/lisdCBm4xICCIAmN5/zY4NXsqoqjjcetLpdGg2m8nPCSwkV34rlSil0hC8LWRpoJRKCTaEgFmRJXgRgMUsDfxi0e/32bMj6BDCXmgymbBnCc8FEZiMqqLokohPwrDPUcHp59JSmYVYAAI3QacZVl7phi0LkYDXbUGW/UsBf/W8MReHliysBWCMpwWctM1mw2/kg7WAtGCTZiZxnlgLeK04SUN2Pun59XodT6dT9uywFoDSGUXR21DCZMVW+RMQfKvV0u9JkL0tAD1vhEso/+gOTSkgNKWA0BRcANEPvScX+yDqVcoAAAAASUVORK5CYII=" />
+    </div>
+    <div>value: <input style='font-size:18px;' id='valueLeft' type='text' size='1' value='1' maxlength='2' /> / <input style='font-size:18px' id='valueRight' type='text' size='1' value='4' maxlength='2' /> beat</div>
+    <div>
+        mode:
+        <select style='font-size:18px;' id='mode'>
+            <option value='0'>insert at last</option>
+            <option value='1'>insert at first</option>
+            <option value='2'>insert at c1</option>
+            <option value='3'>modify c1</option>
+        </select>
+    </div>
+    <div>comment(optional): <input id='comment' size='20' maxlength='30' type='text' /></div>
+    <div>&nbsp;</div>
+    <input id='deleteLast' type='button' value='delete last note' />
+    <input id='delete1Button' type='button' value='delete c1' />
+    <input id='delete2Button' type='button' value='delete c1-c2' />
+    <input id='cutButton' type='button' value='cut c1-c2' />
+    <input id='copyButton' type='button' value='copy c1-c2' />
+    <input id='pasteButton' type='button' value='paste at c1' /><br />
+    <input id='modifyInstrumentButton' type='button' value='modify c1-c2 only instrument' />
+    <input id='modifyBeatButton' type='button' value='modify c1-c2 only beat' />
+    <input id='resetAll' type='button' value='reset all' /><br />
+    <table id='table' style='margin:10px; border:1px solid #000000'></table>
+    <input type='button' id='exportButton' value='Create Text' /><br />
+    <div id='export' style='display:none'>
+        method 1: All event by one object<br />
+        <textarea id='result' style='width:900px; height:400px;' placeholder='export area' readonly='readonly'></textarea><br />
+        Open .map file with text editor and find <div style='display:inline;font-weight:900'>&ltnum_objects&gt(number)&lt/num_objects&gt</div>. Increase the number by 1.<br />
+        Then, find <div style='display:inline;font-weight:900'>&ltobjects&gt</div> tag and paste the contents next to the tag.<br />
+        <br />
+        method 2: Currently not available<br />
+    </div>
+</body>
+</html>
