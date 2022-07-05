@@ -7,3 +7,5 @@ when finished: <br />
 open user/appdata/local/iwm/maps/yourmap.map with notepad <br />
 increase "&lt;num_objects&gt;this number&lt;/num_objects&gt;" <br />
 paste the text in textarea next to "&lt;objects&gt;" <br />
+ <br />
+[http://clrmt.zc.bz/iwm/musicmaker](http://clrmt.zc.bz/iwm/musicmaker)
