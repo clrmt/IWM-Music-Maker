@@ -883,6 +883,8 @@ function createText(){
 
 	if(loopCheck == false){
 		totalFrame = 99999;
+	} else{
+		totalFrame = Math.ceil(totalFrame);
 	}
 
 	var s = '<object y="16" x="16" type="1">';
@@ -894,7 +896,7 @@ function createText(){
 		for(let j=window.pitchBegin;j<window.pitchEnd;j++){
 			if(noteList.list[i].pitch[j].piano){
 				s += '<event eventIndex="17"><param val="';
-				s += currentFrame;
+				s += Math.round(currentFrame);
 				s += '" key="offset"/><param val="';
 				s += totalFrame;
 				s += '" key="frames"/><event eventIndex="104"><param val="';
