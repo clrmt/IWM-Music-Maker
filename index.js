@@ -1,4 +1,4 @@
-var pitchBegin = 17;
+var pitchBegin = 16;
 var pitchEnd = 68;
 var pitchWidth = 20;
 var pitchHeight = 80;
@@ -24,6 +24,8 @@ var musicHighlightElement = null;
 
 var repeatInsertionTimer = null;
 
+var selectedNumber = 0;
+
 function startRepeatInsertion(elem){
 
 	noteList.insertAfter(elem);
@@ -45,14 +47,14 @@ function SoundManager(){
 	let cPitch = 1.0;
 	for(let i=48;i<window.pitchEnd;i++){
 		this.toIWMPitch[i] = Math.round(cPitch * 10000) / 10000;
-		cPitch *= 1.0594630943593;
+		cPitch *= 1.0594630943593; // 2 ^ (1/12)
 	}
 	cPitch = 1.0;
 	for(let i=48;i>=window.pitchBegin;i--){
 		this.toIWMPitch[i] = Math.round(cPitch * 10000) / 10000;
 		cPitch /= 1.0594630943593;
 	}
-	// 위의 모든 경우에서 1.005와 같은 수가 등장하기 않기 때문에 굳이 + EPSILON 할 필요 없음
+	// 모든 경우에서 1.00500000 같은 수가 등장하기 않기 때문에 굳이 + EPSILON 할 필요 없음
 	// Math.round((num + Number.EPSILON) * 100) / 100
 
 	this.list = [];
@@ -191,6 +193,14 @@ function NoteList(){
 
 	this.deleteSelected = function(){
 		
+		if(window.selectedNumber <= 0){
+			return;
+		}
+
+		if(!confirm('continue to delete selected notes')){
+			return;
+		}
+		
 		let parent = document.getElementById('NoteList');
 		let child = parent.firstElementChild;
 		let tempChild = null;
@@ -308,7 +318,7 @@ function NoteList(){
 	// 개수 세고, 수정 준비
 	this.checkSelected = function(){
 		
-		let selectedNumber = 0;
+		window.selectedNumber = 0;
 
 		let valueUp = -1;
 		let valueDown = -1;
@@ -381,6 +391,11 @@ function NoteList(){
 		}
 	}
 	this.copy = function(){
+
+		if(window.selectedNumber <= 0){
+			return;
+		}
+
 		let e = document.getElementById('NoteList').firstElementChild;
 		noteList.clipboard = [];
 		
@@ -397,6 +412,7 @@ function NoteList(){
 				noteList.clipboard.push(newNote);
 			}
 		}
+		document.getElementById('clipboardNumber').innerHTML = noteList.clipboard.length;
 	}
 	this.cut = function(){
 		this.copy();
@@ -893,16 +909,24 @@ function createText(){
 	var currentFrameInteger = 0;
 	var currentFrameDecimal = 0;
 	for(let i=0;i<noteList.list.length;i++){
+		let firstFound = true;
 		for(let j=window.pitchBegin;j<window.pitchEnd;j++){
 			if(noteList.list[i].pitch[j].piano){
-				s += '<event eventIndex="17"><param val="';
-				s += Math.round(currentFrame);
-				s += '" key="offset"/><param val="';
-				s += totalFrame;
-				s += '" key="frames"/><event eventIndex="104"><param val="';
+				if(firstFound){
+					s += '<event eventIndex="17"><param val="';
+					s += Math.round(currentFrame);
+					s += '" key="offset"/><param val="';
+					s += totalFrame;
+					s += '" key="frames"/>';
+					firstFound = false;
+				}
+				s += '<event eventIndex="104"><param val="';
 				s += soundManager.toIWMPitch[j];
-				s += '" key="pitch"/><param val="18" key="sound"/></event></event><param val="1" key="scale"/><param val="0" key="tileset"/>';
+				s += '" key="pitch"/><param val="18" key="sound"/></event>';
 			}
+		}
+		if(firstFound == false){
+			s += '</event><param val="1" key="scale"/><param val="0" key="tileset"/>';
 		}
 		currentFrame += noteList.list[i].valueUp * beat / noteList.list[i].valueDown;
 		currentFrameInteger = Math.floor(currentFrame);
@@ -945,11 +969,21 @@ function setClipboard() {
 }
 
 function transposeLeft(){
-	if(!confirm("Continue to transpose all notes by -1")){
-		return;
+	if(window.selectedNumber > 0){
+		if(!confirm("Continue to transpose selected notes by -1")){
+			return;
+		}
+	} else{
+		if(!confirm("Continue to transpose all notes by -1")){
+			return;
+		}
 	}
+	
 	for(let j=window.pitchBegin + 1;j<window.pitchEnd;j++){
 		for(let i=0;i<noteList.list.length;i++){
+			if(noteList.list[i].selected == false && window.selectedNumber > 0){
+				continue;
+			}
 			noteList.list[i].pitch[j-1].piano = noteList.list[i].pitch[j].piano;
 		}
 	}
@@ -961,11 +995,21 @@ function transposeLeft(){
 }
 
 function transposeRight(){
-	if(!confirm("Continue to transpose all notes by +1")){
-		return;
+	if(window.selectedNumber > 0){
+		if(!confirm("Continue to transpose selected notes by +1")){
+			return;
+		}
+	} else{
+		if(!confirm("Continue to transpose all notes by +1")){
+			return;
+		}
 	}
+
 	for(let j=window.pitchEnd - 2;j>=window.pitchBegin;j--){
 		for(let i=0;i<noteList.list.length;i++){
+			if(noteList.list[i].selected == false && window.selectedNumber > 0){
+				continue;
+			}
 			noteList.list[i].pitch[j+1].piano = noteList.list[i].pitch[j].piano;
 		}
 	}
@@ -1015,9 +1059,19 @@ onload = function(){
 		if(evt.ctrlKey || evt.keyCode == 17){
 			window.ctrlDown = true;
 		}
-		if(window.ctrlDown && evt.keyCode == 65){ // 'A'
+		if(evt.keyCode == 65){// 'A'
 			noteList.selectAllRow();
 		}
+		if(evt.keyCode == 67){ // 'C'
+			noteList.copy();
+		}
+		if(evt.keyCode == 88){ // 'X'
+			noteList.cut();
+		}
+		/*
+		if(window.ctrlDown && evt.keyCode == 65){ // 'A'
+			noteList.selectAllRow();
+		}*/
 		if(evt.keyCode == 46){ // 'Delete'
 			noteList.deleteSelected();
 		}
@@ -1065,5 +1119,20 @@ onload = function(){
 	
 	window.noteList = new NoteList();
 	window.soundManager = new SoundManager();
+
+	document.getElementById('result').onkeydown = function(e){
+		e.stopPropagation();
+		//e.preventDefault();
+	}
+	
+	document.getElementById('transposeLeft').onclick = function(e){
+		e.stopPropagation();
+		transposeLeft();
+	}
+	
+	document.getElementById('transposeRight').onclick = function(e){
+		e.stopPropagation();
+		transposeRight();
+	}
 	
 }
