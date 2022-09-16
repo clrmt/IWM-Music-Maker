@@ -173,7 +173,15 @@ function NoteList(){
 
 	// 특정 elem 다음에 빈 노트 추가
 	this.insertAfter = function(elem){
-		if(window.unloadEventCheck == 0){
+
+		// 혹시모를 대비용, 리스트가 너무 길어질 경우
+		if(this.list.length >= 65536){
+			alert('ERROR: Too much note size.');
+			return;
+		}
+		
+		// insert도중 한 번이라도 노트 개수 8을 넘은 경우, 페이지 이탈시 이벤트를 부착
+		if(this.list.length > 8 && window.unloadEventCheck == 0){
 			window.unloadEventCheck = 1;
 			window.addEventListener('beforeunload', function(evt){
 				evt.preventDefault();
@@ -295,6 +303,7 @@ function NoteList(){
 			elem.previousElementSibling.style.border = "1px solid #ff0000";
 		}
 
+		document.getElementById('cursorLocation').innerText = index.toString(10);
 		noteList.checkSelected();
 
 	}
@@ -445,6 +454,7 @@ function NoteList(){
 			elem = elem.nextElementSibling;
 		}
 
+		document.getElementById('cursorLocation').innerText = '';
 		noteList.checkSelected();
 		
 	}
@@ -574,7 +584,7 @@ function NoteList(){
 				noteList.stopMusic();
 				window.musicTimer = setTimeout(function(){
 					noteList.playMusic(index);
-				}, 200);
+				}, 100);
 				evt.stopPropagation();
 				evt.preventDefault();
 			});		
@@ -621,10 +631,15 @@ function NoteList(){
 
 	this.playMusic = function(idx){
 
-		if(idx >= noteList.list.length){
+		if(idx >= noteList.list.length || idx < 0){
 			noteList.stopMusic();
 			if(document.getElementById('loopCheck').checked == true){
-				noteList.playMusic(0);
+				let nxt = parseInt(document.getElementById('loopMusicFrom').value);
+				if(isNaN(nxt) || nxt < 0){
+					document.getElementById('loopMusicFrom').value = '0';
+					nxt = 0;
+				}
+				noteList.playMusic(nxt);
 			}
 			return;
 		}
@@ -883,24 +898,33 @@ function createText(){
 
 	var beat = window.inputBeat;
 	var loopCheck = document.getElementById('loopCheck').checked;
+	var loopStart = parseInt(document.getElementById('loopMusicFrom').value);
+	if(isNaN(loopStart) || loopStart < 0){
+		document.getElementById('loopMusicFrom').value = '0';
+		loopStart = 0;
+	}
+	if(loopStart >= noteList.list.length){
+		loopStart = 0;
+		loopCheck = false;
+	}
 
-	var sumValue = 0;
-	for(let i=0;i<noteList.list.length;i++){
-		sumValue += noteList.list[i].valueUp / noteList.list[i].valueDown; // cause decimal error
+	var loopTotalValue = 0;
+	for(let i=loopStart;i<noteList.list.length;i++){
+		loopTotalValue += noteList.list[i].valueUp / noteList.list[i].valueDown; // cause decimal error
 	}
 	
 	// 소수 보정
-	var totalFrame = beat * sumValue;
-	var totalFrameDecimal = totalFrame - Math.floor(totalFrame);
-	if(totalFrameDecimal < 0.00000000001 || totalFrameDecimal > 0.99999999999){
-		totalFrame = Math.round(totalFrame);
-		totalFrameDecimal = 0;
+	var loopFrame = beat * loopTotalValue;
+	var loopFrameDecimal = loopFrame - Math.floor(loopFrame);
+	if(loopFrameDecimal < 0.00001 || loopFrameDecimal > 0.99999){
+		loopFrame = Math.round(loopFrame);
+		loopFrameDecimal = 0;
 	}
 
 	if(loopCheck == false){
-		totalFrame = 99999;
+		loopFrame = 99999;
 	} else{
-		totalFrame = Math.ceil(totalFrame);
+		loopFrame = Math.ceil(loopFrame); // 맨 마지막 프레임에서 소수가 잘린 경우 ceil을 함...
 	}
 
 	var s = '<object y="16" x="16" type="1">';
@@ -914,9 +938,15 @@ function createText(){
 			if(noteList.list[i].pitch[j].piano){
 				if(firstFound){
 					s += '<event eventIndex="17"><param val="';
-					s += Math.round(currentFrame);
+					s += Math.round(currentFrame); // 처음 발동할 프레임(반올림 하는게 맞을까?)
 					s += '" key="offset"/><param val="';
-					s += totalFrame;
+					if(loopCheck == true && i < loopStart){
+						// 루프가 있고 루프 이전인 경우 1회만
+						s += "99999";
+					} else{
+						// 루프가 없거나(loopFrame = 99999), 루프가 있을 때(loopFrame < 99999)
+						s += loopFrame; // 첫 번째 이후 간격
+					}
 					s += '" key="frames"/>';
 					firstFound = false;
 				}
@@ -926,28 +956,38 @@ function createText(){
 			}
 		}
 		if(firstFound == false){
-			s += '</event><param val="1" key="scale"/><param val="0" key="tileset"/>';
+			s += '</event>';
 		}
 		currentFrame += noteList.list[i].valueUp * beat / noteList.list[i].valueDown;
 		currentFrameInteger = Math.floor(currentFrame);
 		currentFrameDecimal = currentFrame - currentFrameInteger;
-		if(currentFrameDecimal < 0.00000000001 || currentFrameDecimal > 0.99999999999){
+		if(currentFrameDecimal < 0.00001 || currentFrameDecimal > 0.99999){
 			currentFrame = currentFrameInteger;
 		}
 	}
+
+	// 루프가 없을 때 제거이벤트
 	if(loopCheck == false){
 		s += '<event eventIndex="17"><param val="';
 		s += currentFrame;
 		s += '" key="offset"/><param val="';
-		s += totalFrame;
+		s += loopFrame;
 		s += '" key="frames"/><event eventIndex="103"></event></event><param val="1" key="scale"/><param val="0" key="tileset"/>';
 	}
-	s += '</object>';
+
+	s += '<param val="1" key="scale"/><param val="0" key="tileset"/></object>';
 
 	document.getElementById('result').value = s;
 
-	document.getElementById('copyTextButton').disabled = false;
-	document.getElementById('copyTextButton').value = 'copy text to clipboard';
+	//document.getElementById('copyTextButton').disabled = false;
+	//document.getElementById('copyTextButton').value = 'copy text to clipboard';
+	
+	var totalSecond = Math.round(currentFrame * 2) / 100;
+	var totalFrame = Math.ceil(totalSecond * 50);
+	document.getElementById('resultState').innerText = 'Creation Successful! Total Length: ' + totalSecond.toString(10) + ' seconds, ' + totalFrame.toString(10) + ' frms';
+	if(totalSecond >= 600){
+		document.getElementById('resultState').innerText = 'Warning: Music is too long: ' + totalSecond.toString(10) + ' seconds, ' + totalFrame.toString(10) + ' frms';
+	}
 
 }
 
@@ -1123,7 +1163,7 @@ onload = function(){
 	document.getElementById('result').onkeydown = function(e){
 		e.stopPropagation();
 		//e.preventDefault();
-	}
+	}	
 	
 	document.getElementById('transposeLeft').onclick = function(e){
 		e.stopPropagation();
@@ -1134,5 +1174,12 @@ onload = function(){
 		e.stopPropagation();
 		transposeRight();
 	}
+	/*
+	document.getElementById('button_openpopuploadfromtext').onclick = function(e){
+		document.getElementById('popup_loadfromtext').style.display = 'block';
+	}
+	document.getElementById('button_closepopuploadfromtext').onclick = function(e){
+		document.getElementById('popup_loadfromtext').style.display = 'none';
+	}*/
 	
 }

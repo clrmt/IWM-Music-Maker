@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>IWM Music Maker 1.11</title>
+    <title>IWM Music Maker 1.12</title>
     <script src="index.js"></script>
     <style>
         body {
@@ -18,20 +18,21 @@
     <div style="background-color:#ffffff;width:1200px;height:108px;position:fixed;" id="SettingElement">
         <div style="padding:8px;float:left;height:84px;width:240px;border:1px solid #808080">
             1 beat: <input id="Beat" type="text" size="2" maxlength="3" placeholder="24" value="24" onkeydown="sanitize(this);" onchange="sanitize(this);" />frms<br />
-            <label><input id="loopCheck" type="checkbox" />Loop Music</label><br />
-            Default Value: <input id="ValueUp" type="text" size="1" maxlength="2" value="1" onkeydown="sanitize(this)" ; onchange="sanitize(this);" /> / <input id="ValueDown" type="text" size="1" maxlength="2" placeholder="4" value="4" onkeydown="sanitize(this)" ; onchange="sanitize(this);" />
+            <label title="check if music will last forever"><input id="loopCheck" type="checkbox" />Loop Music From</label> <input id="loopMusicFrom" title="goto index when music ends(0 = first note, 1 = second note, etc)" type="text" size="1" value="0" /><br />
+            Default Value: <input id="ValueUp" type="text" size="1" maxlength="2" value="1" onkeydown="sanitize(this)" ; onchange="sanitize(this);" /> / <input id="ValueDown" type="text" size="1" maxlength="2" placeholder="4" value="4" onkeydown="sanitize(this)" ; onchange="sanitize(this);" /><br />
+            <div title="transpose-1" style="cursor:pointer;display:inline-block" id="transposeLeft">←</div><div title="transpose+1" style="cursor: pointer; display: inline-block" id="transposeRight">→</div>
             <label style="display:none"><input id="pianoCheck" type="checkbox" checked="checked" disabled="disabled" />Piano</label>
             <label style="display:none">><input id="guitarCheck" type="checkbox" disabled="disabled" />Guitar</label>
             <label style="display:none" title="체크되어 있으면 on/off가 반복되고 아니면 좌측 설정대로 덮어씌웁니다."><input id="toggleCheck" type="checkbox" checked="checked" disabled="disabled" />Toggle</label>
         </div>
-        <div id="RowProperty" style="width:240px;height: 84px; padding: 8px; float: left; border: 1px solid #808080">
-            <div id="SelectedNumber" style="display:inline-block">0</div> note(s) selected<br />
+        <div id="RowProperty" style="overflow:hidden;width:270px;height: 84px; padding: 8px; float: left; border: 1px solid #808080">
+            <div id="SelectedNumber" style="display:inline-block">0</div> note(s) selected, cursor: <div id="cursorLocation" style="display:inline"></div><br />
             value: <input class="PropertySelected" id="SelectedValueUp" type="text" size="1" maxlength="2" onkeydown="sanitize(this);" onchange="sanitize(this);" disabled="disabled" /> / <input class="PropertySelected" id="SelectedValueDown" type="text" size="1" maxlength="2" onkeydown="sanitize(this)" ; onchange="sanitize(this);" disabled="disabled" /> <input class="PropertySelected" type="button" value="Apply" disabled="disabled" onclick="noteList.apply();" /><br />
-            <input class="PropertySelected" type="button" value="Copy" disabled="disabled" onclick="noteList.copy();" /><input class="PropertySelected" type="button" value="Cut" disabled="disabled" onclick="noteList.cut();" /><input class="PropertySelected" type="button" value="Delete" disabled="disabled" onclick="noteList.deleteSelected();" /><input class="PropertySelected" type="button" value="Clear" disabled="disabled" onclick="noteList.clear();" />
-            clipboard: <div id="clipboardNumber" style="display:inline-block">0</div> note(s)
+            <input class="PropertySelected" type="button" value="Copy" disabled="disabled" onclick="noteList.copy();" /><input class="PropertySelected" type="button" value="Cut" disabled="disabled" onclick="noteList.cut();" /><input class="PropertySelected" type="button" value="Delete" disabled="disabled" onclick="noteList.deleteSelected();" /><input class="PropertySelected" type="button" value="Clear" disabled="disabled" onclick="noteList.clear();" /><br />
+            clipboard: <div id="clipboardNumber" style="display:inline-block">0</div> note(s) <!--<input id="button_openpopuploadfromtext" type="button" value="load from text" />-->
         </div>
         <div id="Info" style="width:240px;height: 84px; padding: 8px; float: left; border: 1px solid #808080">
-            
+
         </div>
     </div>
     <div style="width:1200px;height:108px;position:fixed;display:none;" id="PianoElement"></div>
@@ -42,7 +43,13 @@
         <input type="button" id="createText" value="Create Text" onclick="createText();" /><br />
     </div>
     <textarea id="result" style="width:600px;height:100px;" readonly="readonly"></textarea><br />
-    <input style="display:none" type="button" onclick="setClipboard();" value="copy text to clipboard" id="copyTextButton" disabled="disabled" /><br />
-    <div title="move all notes to left" style="cursor:pointer;display:inline-block" id="transposeLeft">←</div><div title="move all notes to right" style="cursor: pointer; display: inline-block" id="transposeRight">→</div>
+    <!--<input style="display:none" type="button" onclick="setClipboard();" value="copy text to clipboard" id="copyTextButton" disabled="disabled" /><br />-->
+    <div id="resultState"></div>
+    <!--<div id="popup_loadfromtext" style="display:none;background-color:#ffffff;border:1px solid #000000;padding:18px;position:fixed;inset:0px;width:600px;height:360px;">
+        <input type="button" id="button_closepopuploadfromtext" value='close' />
+        <input type="button" id="button_loadfromtext" value='load to clipboard from below text' /><br />
+        <br />
+        <textarea id="textarea_loadfromtext" style="width:576px;height:294px;" placeholder="<object> ... </object>"></textarea>
+    </div>-->
 </body>
 </html>
