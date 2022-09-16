@@ -1,3 +1,18 @@
+var instrumentList = [18, 19, 10, 3, 0, 4, 2, 20, 21]
+var instrumentRow = 3;
+var instrumentImageData = [
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJGSURBVDhPtVRNa9RQFD1JXpKZsVVrF24sdSXqQnBTdaF1KaILLQou1O79CS4EF4L/QBcuLCpSmOIIg60MFQR/QleOOJ1m0k5lapL5SjL58L6XZNpxJVYPPJJz78vJvTfnRVpY+hzjH0BOr/vG/xFSFBn5fI6uCuI46TiX06HpmuB8aZoqYpIkiXyGoZAsy6itm3j+7A2q32oIohi9vofXr0r4UP6EGBIiWpXKFyy8LKLd7tEzu2JCKAhCIXR55iTW1r7i7KlpzM/N4tbV8zAbm/DdPu7fvIh5WgrJ1b4buDJ7Bla7L0Q4hFDSRoxD4wVIMsNYIQf+ssPEGWOitQy6pkFhKg5SLgh5jQnS1jiVMPB92DtNuJ4roiFtbFstdKyfgnO4XQfWzjZ1EaSRBCPDjmMf05PAkTFV8CiOMK72cWKqIDiHHHZweioHxkve48ChUEhvOHrsOF4svsW5CzMipigMDx4+wpOnjwXnuHRtDqWVJUxMTlDFYRr9rSKecGw7Zcnset1uyhJ41LZlOYio7eGACEKIW4KRPzSVQaWVQVWVEc6hqSp0ijHyHKOKMzHGjeV5HkrvPqJarWO9ZqBmtjAYBGKtlFdpVhD3OhnxfXEZRqOJA4UCKsuruHvvBlzXTyuiwUW0u2Fuo9WyUN/YgmE0xQOO3cZGel+vb8GmtszNHzDMprBGNm9x+vmRcJwOiotl6Hk96Z8nqVp+bLhhMzCmCK6Tt27fuY6AKuUY/ka4s3nyT8E/hOt6KdsjtF+MfP6/B/ALfln5Vj9HjXUAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKzSURBVDhPlZRrSBRRGIaf3Zm9aTuutuKaXckfRWIpRSRSUEoiBkFBd5KgIAmCIIP+RL+KLgRFhUhERmH+kECCvARhUBSpYKmlWWprWaHprrtr7s5sZ2Zx6WKkLxwGzsz3zPt+52Kqqm2OMkuZzGbjGY2KUn0IxWZmIR0S8PsZ9/nQVDUOnRVIslj5+KaTurMnaLhymvamOjRNODKZZg4ySxJ9Ha94V3uNqydLqDyzk3DHY/oEWJLkmYMsNjuNtyo4VlZMQHLgHx0n0eMWPYq9/ydId2Cf40S2WklQXDTV3KP0QCGqqpGs2HnxtJ3hySQ8ixaLeOo0IJFXL/aNjHK1/Cjdba08qLrNxhwrOQkBLKluyk7V8LArwtrdh0lUnEQ1jd+WX3ehikn/6BjPbl5kW6ZEs1cjtySfbPMY0vx5XKpqYWXRHuwOG4lJClokYtTGQZIsE5r4Qf2185hDY+xf7cJmsZCSm4XqD2DLyODynVZyt+wjKTlZRIwYTqZkRDP2xvg4jdfPsSNT5dC6uYyEonhyViCZzKQtXUDFjUaWrCnA6XIRCU/+BtFlgKx2O/V3b1OUHiJFcfCiP0Bnwjy+qhYRwcpgWxeFqVEeVV5gcmJCtNFkFP+qeLN1WDhqRpYllFXZZLgTaesfo/VlL97uPqqfD7Js/WZkixw7Gn8oDgqLPyXIUerah0mOBHF7Uhh9P8CXtx+obRnCs2k7eVt38LeXmAyQbrdw114aPtsYGvpO9f2XDDxpYaSnH18wzOCwj4XLs4wDOp0bXQZIb9wcp8L6g+UElXTSbBreXi9WCdo/+ckvPYI7PR01EjaKplM8mv6Rw+GguOw43xxp9GgKr4M2FhdsIytvwz+dTOmv+8gstoIkdrZJLLt+kLSIaiz3/xR3NCVNxNQbPxkKihGaEQTgJ81dF9VQSM/xAAAAAElFTkSuQmCC',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAASCAYAAAC5DOVpAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKcSURBVDhPrZTdSxRRGMafc+ZjG802a1lMpE8hErFIL+wiCKGgu+gmIkKom/6Bwvv+haDLorsQKrurC7MgJQPZdSW0UGt2S9382pmd2R1n5kzv2d1cL0rIfOFlhjPn/Z3zPs/LsCfP3kXYpeC1567Ef8FkS4LVEdvDGIOialC0ajJe3y5BithA3M1tAv8Kk4VCCHz+lMF0JlVJyypU4BLkKw2IeTY6ci8R8li15k8G6IYBzw8wMTSI5rERGC1JiPUC1tqO48i1fjTuT6LdfAEtqSGjXoIWlsCoTq2W04seg6brEFGE188HYee+4vpSDlcu9lE/CrLpKQymU/jolHD7fCN6kymM4wbU0KsRajAJSg2/Qnp8FCq1cbNM1z92FM0FA0PjKXBvA+uWjd6ODmTXlpHUM2BthzAjLiCiwxVKqWJFM65wLOSXcOtgE/pLDs6EERKLeUwWbLSWyxi2LCwaOroTcWhGA0R8L7hvoW/6PvTABRc+oVjdACYdM3OIl8pEZ2Ceh66mRujUYkiH+WSIO2/C+7ki3aF2GA4n5nA5dQ/d84/JkD11mEqbJ9ZszBCkEArYIsKS5yNtu3Qmw1zJg+mUSRe6g6wKIswud2Ko5wE+tN+pmFC/GaVBc/WeNg9bDkZXC5ikp0brrbQeow3fwgClsgeWX4fQ9mGkcwCM9OJRUKnfhEUbHtJOESuUU24Ro5Rjro03jgWzaCNL6w+X81C6ziJrXEX0JY+e2UcEC2uE2pxx0mXlx3esys1yWOmDzK2hUErnWk+chN7UjJaFMXAewUycoxalFFuGVgI5lyXbRYQwCGkWBQISPO5kcdp8iren7kKXg7vTX5As4iJAzC/CjR0gvURds38N2Zbg6iZIxo5hMqoO/lYX+AVOgiX6cZYxbQAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAASCAYAAAC5DOVpAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAIMSURBVDhPrZTfThNBFMa/2T+UJWULiSxYINJasRiM1Qs0Em94C1/GO5/COx/AR1DhhgTiBSERIpJAYmigdGuhaNvdnfXM7Nbsdqdc8UtOmu7OfOfMOd8s+/hpK8QdocW/d0JGTNd1jFs5WNb4yDBNI16dJnVMc8zE8dEpNr9u0z8NjEXPk/hBgKery1h/s4Zutxs/jfgvpmka6mfn2Nndx8bGOuacabkxiU5rrjp/sbm1iynbwtrLGjzPj98mjsmojF6/T4vyePG8ipueh7OLFs7daxn1yzbcqz9YqZZRKc+jc30j9yRJ94xeigrDMESv18f8fQe1Jw/xbKWM5fKCrJQHnNawjJBAMc2ohbqmg5No3/dlBCQyEBjlJaU1NNrUaLqwLR2Plxw8euCgeC8P97JFQiEUc5EoxRgd1W3+JjEDxRkbi7MFFB0bTUpwG0oxgeidRp4bIPwn4jYy7qPWyt7kcibevf8AxiN7hJS3ulqVSVTNF6QqE0vExAKfozCZx8SEBaYbVKFBhh7D9NSk7L7wlkg6TKoykfFXvYFvewcolRZQqbyl/sWbaLIBJTo8OsH3Hyco0JUbJnEDGNrtDr583sZFI5raKGwy9utXNSyVFmWCAam7aRg6Wq02jn+eSnuo4Jxjdm5GCgljJ8l8z0SF0dTUYgJOQxEmHiZjDc5D2WDP80aGSggA/gH50dHK85u1CwAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAK2SURBVDhPrZRbSFRRFIa/c46jM2rZg9mgaSZWVJR0oQx7CCkq6KGnigp66TW6EmGvFYYkQkRCLyEYpmhZQRBdQJIkLxlGaY05k5oheclmnJlzbZ8ZHSWdfOmHxTln7b3/vf5/r7OlqoYmi/8AeeoZB9JULIy4RLKiYIlhS5KRZGUqGx/zEskJifR7PNSXnqHh+jl637VFckjxq4sRyWJXxeFASXTi6+nB33mLhsZ1VFevImWilt737YgS4yJCZJOMD//AKwi+fOji15NrXDks0/LyJw9qh7lQvonu57cZHxkTc+d3I5J1OJNoelRPz80SwjWlnM2zeF0ZoMjo4/guHYa+I+mGmLmANF1V2bLnAOlZ2QRCOuVtFptXh4UUB/wep/FqO5kb95OatgjTiuqL2CBiGrE+ciQ5GfR5UVUNNagSflXGtUtO7tcFaJaPsW3vfiRLxTJNocDF545W1Ek/awt3YmjajNlaOETWilyWZebw7c1DTh8SuyWmcbCkkET/a4b6vOiahWEpDPZ6eHqngtBkIOZZrCJJJMJBjea6CkovSmT88KGnLCGhIF+Uq3PmVD99XiFX01nvNtmRP8Yz9QRF+3aLIsIzFSW5kqkpL+PqeZOMse8iIzPaNsKnSg8ENCrKltJYk8ndo0FOZviRnQ7hV3StjRiRfSLifFCau4X7JpYik7FSJsU7gKe8k+F7Hxmq6magOUzedgN9JIhp2iuiiBHpmsrW4mJqX4iUbwJpyA9+lZyNFun+EMGOEFZ3kA0FYX6P6rR+dZO7Zg1GpC1meWQjKTmVrrctTD6+YbsvRkXfyBJKQvTV7mxDMzAXZ+E+cpmcbHfEHxtzrhE5wcFAn0/oN8XX3Aa0RN7lcuFeniX6L0piY977SBYl/OP/FGQWphGVNI1ZZs/ANHShPX78TQLwB/D0OzGtToRKAAAAAElFTkSuQmCC',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJ4SURBVDhPrZTdS5NhGMZ/z/u++3KzuZliuSCKSqRMsw8DQ0XtH/Ckg6CziP6BoPPO6rCDQIgKSqIWeNIKDU3sUzRTTDdXU5O0snCb+3Afb89ySXMbnXSdvLz3/XA913PdH+K2+7nOf4CS/RaFwWRGMxqzf8VRnEgIVIOJJz0PeOXpx1K6LZsojKJEimZk8G435/Y/prnmBYPuXgxGUzabj+JEqsJn3wdaT5RQ32Ah4PVLhYZsNh8FiRRNIxKJYzOppIMJ0qOzmI2CeCKFUArfnRfNHIxF4wxcv8K14/NSmeDATo3ztn5eP+ohnZZFlv5tRR6RxWrjfvctLtdM4GpxoFc60Zvr6DxbiWv6DjNTXgyG/CrmECmqypzfT722SHmDU0bkzQ67TMhju7bTdNTOuneEUCgkReWqyiEymi28e/OeUy4flfI5+l4XfFoAXwB97hstHVa+jPYSXI2iSh//xiaRomr4JqeoFc9oq7XAxCpiKICYWEEM+BEzqzAZ5uoFB96nNwgFwzmqNmkVRRAOh6ha+Ih1t8bNt04Ww6p8nSPzQBK6oKM6TPOhEMHZGRLJ5Ibp+saEbSrSZcBokg0nzDwcL2V0xcLgEsRSCssxwcuvOu5AGdNehRKbHXVLG+QMbWauxoeHmPfcY3kthS4F9Z0J4f2h0uW2UmNPkTBa6bx4CWdFBamMqixyaBPxGI1t7VS3d7Emmy+5HkWcLMN60Ma69OSnauO0JCmvqsohyaDgGimRAzrS5yH8fYlG1UNE38ZYspXaI4fZsWff7wu3oug+Mki/0tLgsaFh6YmNuqZjxKORPCV/8M/FpskuzhQilUxkI4UAvwAvVuGSm0cwQwAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAMmSURBVDhPdZRLbFRlGIafc50LRVq5JKXp2BpdgCRKQipFAskkRaJRIyawk9AYXZAYTVipGxdo3LsgqbHKZSWQICqEaDQVMTUjG1KDWqBYi3am0LnPmXPmnOP3nzO0TFLf5J/L973zzvtd/qMdPzsRsgJ0XQet/aWNMAgJwxXpCLsTmq5h2za14iKlfJ5yoRCd4vw8XtPBsqw2sxMdjgzTEIESTukuY1/9zFx+EUM5EzQ9nz1Pb2b4iQwb+geV5Q53S0JKxK9VGf9ygsvX81hvvUO97xHw/ZiYMElfOEfj24u8tjNDNrsL74FSIyFVTqNc5tT5H7my7UVWZ4cxNzq8u96kW0hJ6dWfhHx8M8CtJ6gcO8UBptm7N4toRYh8m4aJJ26mFv5m4PVhjIEaH3abvGmZvCpnv2kyWWrR3ePTP+jQe2Q/V3OTJC0bTYsnoqsP1WKRY2e+pz56FF9r8lHKZjRtRoQDdx1GCg2m3AAzANcJeGhtyK2X3uPTsXGSyUTEi4R8r0U5qNC/L0Oz0WKdEf/LKyKSkybP+gFpKd+XfvRIypD33n2PUZCp3h9G/Cpilqlh2DAgIu+XXDb9W2fKC0hJ2mrbr0s/jq5J8Kj82EiG6IYRxRUiIUXzWxoLJXi72+YDIdsSlAEv9UChS1wduufweyhNLy7HFSKhUGKVO0Xyx6f5uhDwsIypTxwub0kMXQz0dOlU/moxe+Ka9MuNqolyag+SXat4YfdWVl06yfgVjaHzi9xoBCTTUkJCSpZjpTXKcy1mfmoymwvov/oFzz4/QtMVMYGphGw7wZNbt3D60hjatd8INz7O7UoTw5CFa/tSJTp1naCVwspdxL53i6e2HcSTQUX5+5utHP46+Quf//AHXu8makPPEa5eq25qRMSwsKdzmLevs25mgsMHX6YvkyEI4ny8LBE0tj+zA0fqvvzdN8zX8jhml0RjR4FmsL46Q2LhBofeGCUzOLDkRqHj0ir76vGRSiU4+cln/DN3Z2nEnvRi90iWoR3bcV1PrmDbaRsdQg8ilUpKj5b3RMEVMSWyEuKFXAGNhkO1Wus4/ycC8B/m1FrFRSYkjwAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKHSURBVDhPrZNNSBRhGICfb2Z3dlfddl11VQTFnzqkdUqiAokQj2WXisBLP7eQ0CiIQOgQdIgOQUSXJOjSoaAgwoqiJDPKSgIXU3HzBzVR8SfXnZ35+mb8QSmVqOfyDjPzPnzvzyfuPngt+Q9oS/GfWSPSNA1d19FV/FtWMrxeD4ODI3TF+uiNDyHS0sEwlr5ujityTtDdE8fw+Yjm55IRDjF/5zZm21uIZIHH4/68Ea7IlpKc7AjxoRHKK7ZxrPUJ+z61U9LyiKlL57EGBpChMFKVjRA405EsxmVWpub0ZzqZItB8i6x4H9V7djE7NExKnaZ9ZIIJTcc40wDBLVhSoMmkk+XKhPu0hG3bBH1etKN1jKVl8LTtA6mZWTzTsxyoKKPGr5O4epnJ69coTf9GnaynWHRg4XXz14xHWhYiEsF79gLj/jTeDf9Az4uSGp+gZXSce4k5+r3dlMeu0NleTre5F02k3Nw1IhfTRGwJ4Wu8yJhq9MeOTh73xmm2bIyARk00QW2TpOsVFPX0ELBMt7zfRQ5mEqF6EahvZCyaz8O5OZKaZH7G5lxnIXZVLUaxD39hOv7ET6QawJ9FDkqmZ+ain26gKq+A0MQCif1BtXDQWlDN88ojjESymUwPqcbL9UWa1Bn1fKavKEbpiSZKbuzgUP8MJ+0Up7aa3Bzw8XIuE79qt8P6l1a9lULSH3zDWDhG39cpDpvHCXpCiJww999/J+AzOLgzykJKbdWGt1/tixQ2llANtTX8KY3osy8M11YiFkwsW6q7uVjU+j1yUCcSSuaxfXiFoZbWpqxUiZ1qVIOXJQ4bixyctVVCtbIkdQ8vtu9GtxZ3ZzWbi1bhOA0lceJa4BcNkejkt8Y0JgAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKySURBVDhPrZRbSBRhFMf/szOu42ppRq673hYStouYFoLVQw+GPqgUBT1UhBERRQVdoF6KQPAtfKugCPKpHlJJohtRZJaapq5BqWka4u6Wlut6wd2dmb7vzOzNpZ76wbBnzsf3n+87539WaGp+o+E/YDJ+EzAnmyGnJEOWjYfFkiQZq4kknMhkEpAkJaG15Tm83p/snX9LQDAURHl5KbaUbIKqKuyJv0hESBAECEykp9uFj72fUFe3H9UVWyGJLM/WfP5l3G5qQ/vbHtTUViA31wZFUUiEE3MiDYODw5DZlS6cPoD0VFlPr2B8ahZX6m+guHgDbLYsaJq+nWokiiI83mmMfBnF1UtH/irCcdgz0HDtDB63vWSf5jfR8yQUWA5g8rsHlZU7wMvZ/m4AM798fCmO3r4huD3TyLOuQvn2Ugx9/kqH4LBaClhYXML42ARO1tVS8uadZox+m6Q4lgesAf2uEYpPHduH9x29kU7q7WfHs6SYKeQcOrwH+fk5xluUmurdcG5cT3FmugzJHLVDxEexzazaVYLsdRmU63RNYHDYTfmdZU44crIopiLHbNKFWEJVVAo5kqing4Egzp1vwPXGu/QuMk+RrRghRYNqdIxj4rEkidDEJHQNjBlpHe4fR54VNutaIxPl6et+ZK5hpzbEyEe8YFNuLz6w4t2/V08L/yIQVFG19yyOnzhILudadFDu0DSLBZb01Wh50oXZhSBtWMlSQMH8sorGWw+xuchJ+8K3izhbZHVZZDbo7nTB+2MGly8eZZ2zR8YgmTm+9dErPHvRAUdBDraVFZFI3NUoYnAxv38BPp8ffWzefHPzVCeOwppRWFiA3Lxs2O1WGuawCCdOiMM38uLP/p5jEx/iFiN4h9JSLUixyAiFosMaJkEoDP0bhAfJQNPUSE3iAf4AlQQJTHPbUooAAAAASUVORK5CYII='
+];
+var instrumentEnd = 30;
+
 var pitchBegin = 16;
 var pitchEnd = 68;
 var pitchWidth = 20;
@@ -138,13 +153,12 @@ function Note(){
 	this.valueDown = window.inputValueDown; // 분모
 	this.selected = false;
 	this.pitch = [];
-	this.pitchSelected = [];
 	for(let i=0;i<100;i++){
-		let v = {};
-		v.piano = false;
-		v.guitar = false;
+		let v = [];
+		for(let j=0;j<window.instrumentEnd;j++){
+			v.push(false)
+		}
 		this.pitch.push(v);
-		this.pitchSelected.push(false);
 	}
 }
 Note.prototype.deepCopy = function(){
@@ -152,7 +166,9 @@ Note.prototype.deepCopy = function(){
 	cNote.valueUp = this.valueUp;
 	cNote.valueDown = this.valueDown;
 	for(let i=window.pitchBegin;i<window.pitchEnd;i++){
-		cNote.pitch[i].piano = this.pitch[i].piano;
+		for(let j=0;j<window.instrumentEnd;j++){
+			cNote.pitch[i][j] = this.pitch[i][j];
+		}
 	}
 	return cNote;
 }
@@ -238,6 +254,7 @@ function NoteList(){
 	this.select = function(elem){
 		let pitch = parseInt(elem.getAttribute('pitch'));
 		let index = parseInt(elem.parentNode.parentNode.getAttribute('index'));
+		/*
 		if(window.toggleCheck.checked == true){
 			if(window.pianoCheck.checked){
 				noteList.list[index].pitch[pitch].piano = !noteList.list[index].pitch[pitch].piano;
@@ -248,6 +265,25 @@ function NoteList(){
 		} else {
 			noteList.list[index].pitch[pitch].piano = window.pianoCheck.checked;
 			noteList.list[index].pitch[pitch].guitar = window.guitarCheck.checked;
+		}
+		*/
+		let exist = false;
+		for(let i=0;i<window.instrumentEnd;i++){
+			if(noteList.list[index].pitch[pitch][i] == true){
+				exist = true;
+				break;
+			}
+		}
+		if(exist == true){
+			for(let i=0;i<window.instrumentEnd;i++){
+				noteList.list[index].pitch[pitch][i] = false;
+			}
+		} else{
+			for(let i=0;i<window.instrumentEnd;i++){
+				if(eInstrument[i] != null){
+					noteList.list[index].pitch[pitch][i] = eInstrument[i].checked;
+				}
+			}
 		}
 		
 		this.color(elem, true);
@@ -433,10 +469,10 @@ function NoteList(){
 		for(let i=0;i<noteList.list.length;i++){
 			if(noteList.list[i].selected == true){
 				for(let j=window.pitchBegin;j<window.pitchEnd;j++){
-					if(noteList.list[i].pitch[j].piano == true){
-						noteList.list[i].pitch[j].piano = false;
-						this.color(e.children[1].children[j - window.pitchBegin], false);
+					for(let k=0;k<window.instrumentEnd;k++){
+						noteList.list[i].pitch[j][k] = false;
 					}
+					this.color(e.children[1].children[j - window.pitchBegin], false);
 				}
 			}
 			e = e.nextElementSibling;
@@ -654,8 +690,11 @@ function NoteList(){
 		}
 		
 		for(let i=window.pitchBegin;i<window.pitchEnd;i++){
-			if(noteList.list[idx].pitch[i].piano){
-				window.soundManager.play(i);
+			for(let k=0;k<window.instrumentEnd;i++){
+				if(noteList.list[idx].pitch[i][k] == true){
+					window.soundManager.play(i);
+					break;
+				}
 			}
 		}
 		
@@ -685,21 +724,28 @@ function NoteList(){
 	this.color = function(elem, snd){
 		let pitch = parseInt(elem.getAttribute('pitch'))
 		let index = parseInt(elem.parentNode.parentNode.getAttribute('index'));
-		let r = 255;
-		let g = 255;
-		let b = 255;
-		if(this.list[index].pitch[pitch].piano == true){
-			g -= 127;
+		
+		let instrumenColor = 255;
+		let instrumentNumber = 0;
+		for(let i=0;i<window.instrumentList.length;i++){
+			if(this.list[index].pitch[pitch][instrumentList[i]] == true){
+				instrumenColor *= 0.5;
+				instrumentNumber++;
+			}
 		}
-		if(this.list[index].pitch[pitch].guitar == true){
-			b -= 127;
+		
+		instrumentColor = Math.round(instrumenColor).toString(16);
+		if(instrumentColor.length == 1){
+			instrumentColor = '0' + instrumentColor;
 		}
+		
 		if(snd){
-			if(r != 255 || g != 255 || b != 255){
+			if(instrumentNumber > 0){
 				window.soundManager.play(pitch);
 			}
 		}
-		elem.style.backgroundColor = '#' + r.toString(16) + g.toString(16) + b.toString(16);
+		
+		elem.style.backgroundColor = '#' + instrumentColor + instrumentColor + instrumentColor;
 	}
 
 	// 맨 마지막에 빈 노트 생성
@@ -935,24 +981,29 @@ function createText(){
 	for(let i=0;i<noteList.list.length;i++){
 		let firstFound = true;
 		for(let j=window.pitchBegin;j<window.pitchEnd;j++){
-			if(noteList.list[i].pitch[j].piano){
-				if(firstFound){
-					s += '<event eventIndex="17"><param val="';
-					s += Math.round(currentFrame); // 처음 발동할 프레임(반올림 하는게 맞을까?)
-					s += '" key="offset"/><param val="';
-					if(loopCheck == true && i < loopStart){
-						// 루프가 있고 루프 이전인 경우 1회만
-						s += "99999";
-					} else{
-						// 루프가 없거나(loopFrame = 99999), 루프가 있을 때(loopFrame < 99999)
-						s += loopFrame; // 첫 번째 이후 간격
+			for(let k=0;k<window.instrumentList.length;k++){
+				let cInst = window.instrumentList[k];
+				if(noteList.list[i].pitch[j][cInst] == true){
+					if(firstFound){
+						s += '<event eventIndex="17"><param val="';
+						s += Math.round(currentFrame); // 처음 발동할 프레임(반올림 하는게 맞을까?)
+						s += '" key="offset"/><param val="';
+						if(loopCheck == true && i < loopStart){
+							// 루프가 있고 루프 이전인 경우 1회만
+							s += "99999";
+						} else{
+							// 루프가 없거나(loopFrame = 99999), 루프가 있을 때(loopFrame < 99999)
+							s += loopFrame; // 첫 번째 이후 간격
+						}
+						s += '" key="frames"/>';
+						firstFound = false;
 					}
-					s += '" key="frames"/>';
-					firstFound = false;
+					s += '<event eventIndex="104"><param val="';
+					s += soundManager.toIWMPitch[j];
+					s += '" key="pitch"/><param val="';
+					s += cInst.toString(10); // 악기
+					s += '" key="sound"/></event>';
 				}
-				s += '<event eventIndex="104"><param val="';
-				s += soundManager.toIWMPitch[j];
-				s += '" key="pitch"/><param val="18" key="sound"/></event>';
 			}
 		}
 		if(firstFound == false){
@@ -1021,12 +1072,19 @@ function transposeLeft(){
 	
 	for(let j=window.pitchBegin + 1;j<window.pitchEnd;j++){
 		for(let i=0;i<noteList.list.length;i++){
+
+			// 어딘가 선택은 되었으나 현재 노트가 선택되지 않은 경우
 			if(noteList.list[i].selected == false && window.selectedNumber > 0){
 				continue;
 			}
-			noteList.list[i].pitch[j-1].piano = noteList.list[i].pitch[j].piano;
+
+			for(let k=0;k<window.instrumentEnd;k++){
+				noteList.list[i].pitch[j-1][k] = noteList.list[i].pitch[j][k];
+				noteList.list[i].pitch[j][k] = false;
+			}
 		}
 	}
+	
 	let e = document.getElementById('NoteList').firstElementChild;
 	for(let i=0;i<noteList.list.length;i++){
 		noteList.colorRow(e);
@@ -1050,7 +1108,11 @@ function transposeRight(){
 			if(noteList.list[i].selected == false && window.selectedNumber > 0){
 				continue;
 			}
-			noteList.list[i].pitch[j+1].piano = noteList.list[i].pitch[j].piano;
+			
+			for(let k=0;k<window.instrumentEnd;k++){
+				noteList.list[i].pitch[j+1][k] = noteList.list[i].pitch[j][k];
+				noteList.list[i].pitch[j][k] = false;
+			}
 		}
 	}
 	let e = document.getElementById('NoteList').firstElementChild;
@@ -1061,6 +1123,9 @@ function transposeRight(){
 }
 
 var unloadEventCheck = 0;
+
+var eInstrument = []
+var eToggleInstrument = null;
 
 onload = function(){
 
@@ -1080,9 +1145,40 @@ onload = function(){
 		});
 	}
 
-	window.guitarCheck = document.getElementById('guitarCheck');
-	window.pianoCheck = document.getElementById('pianoCheck');
-	window.toggleCheck = document.getElementById('toggleCheck');
+
+
+	for(let i = 0;i<100;i++){
+		eInstrument[i] = null;
+	}
+
+	for(let i = 0;i<window.instrumentList.length;i++){
+
+		if(i != 0 && i % window.instrumentRow == 0){
+			eBR = document.createElement('BR');
+			document.getElementById('instrument').appendChild(eBR);
+		}
+
+		let code = instrumentList[i];
+
+		let eLabel = document.createElement('LABEL');
+		let eInput = document.createElement('INPUT');
+		eInput.setAttribute('id', 'instrument' + code.toString(10));
+		eInput.setAttribute('type', 'checkbox');
+		if(i == 0){
+			eInput.setAttribute('checked', 'checked')
+		}
+		let eImg = document.createElement('IMG')
+		eImg.setAttribute('src', window.instrumentImageData[i])
+
+		eInstrument[code] = eInput;
+
+		eLabel.appendChild(eInput);
+		eLabel.appendChild(eImg);
+		document.getElementById('instrument').appendChild(eLabel);
+	}
+
+	//window.eToggleInstrument = document.getElementById('toggleCheck');
+
 	window.pianoElement = document.getElementById('PianoElement');
 	window.settingElement = document.getElementById('SettingElement');
 
