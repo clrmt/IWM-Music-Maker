@@ -690,7 +690,8 @@ function NoteList(){
 		}
 		
 		for(let i=window.pitchBegin;i<window.pitchEnd;i++){
-			for(let k=0;k<window.instrumentEnd;i++){
+			for(let k=0;k<window.instrumentEnd;k++){
+				console.log(idx, i, k);
 				if(noteList.list[idx].pitch[i][k] == true){
 					window.soundManager.play(i);
 					break;
@@ -1041,7 +1042,7 @@ function createText(){
 	}
 
 }
-
+/*
 function setClipboard() {
 	
 	let text = document.getElementById('result').value;
@@ -1058,7 +1059,7 @@ function setClipboard() {
         }
     );
 }
-
+*/
 function transposeLeft(){
 	if(window.selectedNumber > 0){
 		if(!confirm("Continue to transpose selected notes by -1")){
