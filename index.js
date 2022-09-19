@@ -668,9 +668,11 @@ function NoteList(){
 
 	this.playMusic = function(idx){
 
+		// 음악이 종료된 경우
 		if(idx >= noteList.list.length || idx < 0){
 			noteList.stopMusic();
 			if(document.getElementById('loopCheck').checked == true){
+				// 루프?
 				let nxt = parseInt(document.getElementById('loopMusicFrom').value);
 				if(isNaN(nxt) || nxt < 0){
 					document.getElementById('loopMusicFrom').value = '0';
@@ -692,6 +694,9 @@ function NoteList(){
 		
 		for(let i=window.pitchBegin;i<window.pitchEnd;i++){
 			for(let k=0;k<window.instrumentEnd;k++){
+				if(k == window.triggerNumber){
+					continue;
+				}
 				if(noteList.list[idx].pitch[i][k] == true){
 					window.soundManager.play(i);
 					break;
@@ -775,7 +780,7 @@ function NoteList(){
 		}
 		
 		if(snd){
-			if(instrumentNumber > 0){
+			if(instrumentNumber > 0 && window.selectedInstrument != window.triggerNumber){
 				window.soundManager.play(pitch);
 			}
 		}
