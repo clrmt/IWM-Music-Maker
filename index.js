@@ -1,5 +1,5 @@
 var instrumentList = [18, 19, 10, 3, 0, 4, 2, 20, 21]
-var instrumentRow = 3;
+var instrumentRow = 5;
 var instrumentImageData = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJGSURBVDhPtVRNa9RQFD1JXpKZsVVrF24sdSXqQnBTdaF1KaILLQou1O79CS4EF4L/QBcuLCpSmOIIg60MFQR/QleOOJ1m0k5lapL5SjL58L6XZNpxJVYPPJJz78vJvTfnRVpY+hzjH0BOr/vG/xFSFBn5fI6uCuI46TiX06HpmuB8aZoqYpIkiXyGoZAsy6itm3j+7A2q32oIohi9vofXr0r4UP6EGBIiWpXKFyy8LKLd7tEzu2JCKAhCIXR55iTW1r7i7KlpzM/N4tbV8zAbm/DdPu7fvIh5WgrJ1b4buDJ7Bla7L0Q4hFDSRoxD4wVIMsNYIQf+ssPEGWOitQy6pkFhKg5SLgh5jQnS1jiVMPB92DtNuJ4roiFtbFstdKyfgnO4XQfWzjZ1EaSRBCPDjmMf05PAkTFV8CiOMK72cWKqIDiHHHZweioHxkve48ChUEhvOHrsOF4svsW5CzMipigMDx4+wpOnjwXnuHRtDqWVJUxMTlDFYRr9rSKecGw7Zcnset1uyhJ41LZlOYio7eGACEKIW4KRPzSVQaWVQVWVEc6hqSp0ijHyHKOKMzHGjeV5HkrvPqJarWO9ZqBmtjAYBGKtlFdpVhD3OhnxfXEZRqOJA4UCKsuruHvvBlzXTyuiwUW0u2Fuo9WyUN/YgmE0xQOO3cZGel+vb8GmtszNHzDMprBGNm9x+vmRcJwOiotl6Hk96Z8nqVp+bLhhMzCmCK6Tt27fuY6AKuUY/ka4s3nyT8E/hOt6KdsjtF+MfP6/B/ALfln5Vj9HjXUAAAAASUVORK5CYII=',
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKzSURBVDhPlZRrSBRRGIaf3Zm9aTuutuKaXckfRWIpRSRSUEoiBkFBd5KgIAmCIIP+RL+KLgRFhUhERmH+kECCvARhUBSpYKmlWWprWaHprrtr7s5sZ2Zx6WKkLxwGzsz3zPt+52Kqqm2OMkuZzGbjGY2KUn0IxWZmIR0S8PsZ9/nQVDUOnRVIslj5+KaTurMnaLhymvamOjRNODKZZg4ySxJ9Ha94V3uNqydLqDyzk3DHY/oEWJLkmYMsNjuNtyo4VlZMQHLgHx0n0eMWPYq9/ydId2Cf40S2WklQXDTV3KP0QCGqqpGs2HnxtJ3hySQ8ixaLeOo0IJFXL/aNjHK1/Cjdba08qLrNxhwrOQkBLKluyk7V8LArwtrdh0lUnEQ1jd+WX3ehikn/6BjPbl5kW6ZEs1cjtySfbPMY0vx5XKpqYWXRHuwOG4lJClokYtTGQZIsE5r4Qf2185hDY+xf7cJmsZCSm4XqD2DLyODynVZyt+wjKTlZRIwYTqZkRDP2xvg4jdfPsSNT5dC6uYyEonhyViCZzKQtXUDFjUaWrCnA6XIRCU/+BtFlgKx2O/V3b1OUHiJFcfCiP0Bnwjy+qhYRwcpgWxeFqVEeVV5gcmJCtNFkFP+qeLN1WDhqRpYllFXZZLgTaesfo/VlL97uPqqfD7Js/WZkixw7Gn8oDgqLPyXIUerah0mOBHF7Uhh9P8CXtx+obRnCs2k7eVt38LeXmAyQbrdw114aPtsYGvpO9f2XDDxpYaSnH18wzOCwj4XLs4wDOp0bXQZIb9wcp8L6g+UElXTSbBreXi9WCdo/+ckvPYI7PR01EjaKplM8mv6Rw+GguOw43xxp9GgKr4M2FhdsIytvwz+dTOmv+8gstoIkdrZJLLt+kLSIaiz3/xR3NCVNxNQbPxkKihGaEQTgJ81dF9VQSM/xAAAAAElFTkSuQmCC',
@@ -12,6 +12,16 @@ var instrumentImageData = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKySURBVDhPrZRbSBRhFMf/szOu42ppRq673hYStouYFoLVQw+GPqgUBT1UhBERRQVdoF6KQPAtfKugCPKpHlJJohtRZJaapq5BqWka4u6Wlut6wd2dmb7vzOzNpZ76wbBnzsf3n+87539WaGp+o+E/YDJ+EzAnmyGnJEOWjYfFkiQZq4kknMhkEpAkJaG15Tm83p/snX9LQDAURHl5KbaUbIKqKuyJv0hESBAECEykp9uFj72fUFe3H9UVWyGJLM/WfP5l3G5qQ/vbHtTUViA31wZFUUiEE3MiDYODw5DZlS6cPoD0VFlPr2B8ahZX6m+guHgDbLYsaJq+nWokiiI83mmMfBnF1UtH/irCcdgz0HDtDB63vWSf5jfR8yQUWA5g8rsHlZU7wMvZ/m4AM798fCmO3r4huD3TyLOuQvn2Ugx9/kqH4LBaClhYXML42ARO1tVS8uadZox+m6Q4lgesAf2uEYpPHduH9x29kU7q7WfHs6SYKeQcOrwH+fk5xluUmurdcG5cT3FmugzJHLVDxEexzazaVYLsdRmU63RNYHDYTfmdZU44crIopiLHbNKFWEJVVAo5kqing4Egzp1vwPXGu/QuMk+RrRghRYNqdIxj4rEkidDEJHQNjBlpHe4fR54VNutaIxPl6et+ZK5hpzbEyEe8YFNuLz6w4t2/V08L/yIQVFG19yyOnzhILudadFDu0DSLBZb01Wh50oXZhSBtWMlSQMH8sorGWw+xuchJ+8K3izhbZHVZZDbo7nTB+2MGly8eZZ2zR8YgmTm+9dErPHvRAUdBDraVFZFI3NUoYnAxv38BPp8ffWzefHPzVCeOwppRWFiA3Lxs2O1WGuawCCdOiMM38uLP/p5jEx/iFiN4h9JSLUixyAiFosMaJkEoDP0bhAfJQNPUSE3iAf4AlQQJTHPbUooAAAAASUVORK5CYII='
 ];
 var instrumentEnd = 30;
+var instrumentColor = [];
+instrumentColor.push([197,29,52]);
+instrumentColor.push([132,195,190]);
+instrumentColor.push([59,131,189]);
+instrumentColor.push([247,94,37]);
+instrumentColor.push([169,131,7]);
+instrumentColor.push([222,76,138]);
+instrumentColor.push([166,94,46]);
+instrumentColor.push([243,218,11]);
+instrumentColor.push([87,166,57]);
 
 var pitchBegin = 16;
 var pitchEnd = 68;
@@ -137,15 +147,6 @@ function SoundManager(){
 		this.list[pitch].currentTime = 0;
 		this.list[pitch].play();
 	}
-}
-
-function Pitch(){
-	this.toNumber = function(){
-
-	}
-}
-Pitch.toPitch = function(){
-
 }
 
 function Note(){
@@ -726,18 +727,33 @@ function NoteList(){
 		let pitch = parseInt(elem.getAttribute('pitch'))
 		let index = parseInt(elem.parentNode.parentNode.getAttribute('index'));
 		
-		let instrumenColor = 255;
+		let r = 255;
+		let g = 255;
+		let b = 255;
 		let instrumentNumber = 0;
 		for(let i=0;i<window.instrumentList.length;i++){
 			if(this.list[index].pitch[pitch][instrumentList[i]] == true){
-				instrumenColor *= 0.5;
+				r += instrumentColor[i][0];
+				g += instrumentColor[i][1];
+				b += instrumentColor[i][2];
 				instrumentNumber++;
 			}
 		}
 		
-		instrumentColor = Math.round(instrumenColor).toString(16);
-		if(instrumentColor.length == 1){
-			instrumentColor = '0' + instrumentColor;
+		r %= 256;
+		g %= 256;
+		b %= 256;
+		r = r.toString(16);
+		if(r.length == 1){
+			r = '0' + r;
+		}
+		g = g.toString(16);
+		if(g.length == 1){
+			g = '0' + g;
+		}
+		b = b.toString(16);
+		if(b.length == 1){
+			b = '0' + b;
 		}
 		
 		if(snd){
@@ -746,7 +762,7 @@ function NoteList(){
 			}
 		}
 		
-		elem.style.backgroundColor = '#' + instrumentColor + instrumentColor + instrumentColor;
+		elem.style.backgroundColor = '#' + r + g + b;
 	}
 
 	// 맨 마지막에 빈 노트 생성
@@ -797,6 +813,7 @@ function createPiano(){
 		let height = window.pitchHeight;
 		let zIndex = 1;
 		let backgroundColor = '#ffffff'
+		let color = '#000000';
 
 		if(i % 12 == 0){ // 도
 			width += window.pitchHalfWidth;
@@ -809,6 +826,7 @@ function createPiano(){
 			zIndex = 2;
 			height = pitchBlackHeight;
 			backgroundColor = '#000000';
+			color = '#ffffff';
 		}
 		if(i % 12 == 2){ // 레
 			width += window.pitchWidth;
@@ -821,6 +839,7 @@ function createPiano(){
 			zIndex = 2;
 			height = pitchBlackHeight;
 			backgroundColor = '#000000';
+			color = '#ffffff';
 		}
 		if(i % 12 == 4){ // 미
 			left -= window.pitchHalfWidth;
@@ -836,6 +855,7 @@ function createPiano(){
 			zIndex = 2;
 			height = pitchBlackHeight;
 			backgroundColor = '#000000';
+			color = '#ffffff';
 		}
 		if(i % 12 == 7){ // 솔
 			width += window.pitchWidth;
@@ -848,6 +868,7 @@ function createPiano(){
 			zIndex = 2;
 			height = pitchBlackHeight;
 			backgroundColor = '#000000';
+			color = '#ffffff';
 		}
 		if(i % 12 == 9){ // 라
 			width += window.pitchWidth;
@@ -860,6 +881,7 @@ function createPiano(){
 			zIndex = 2;
 			height = pitchBlackHeight;
 			backgroundColor = '#000000';
+			color = '#ffffff';
 		}
 		if(i % 12 == 11){ // 시
 			left -= window.pitchHalfWidth;
@@ -874,8 +896,14 @@ function createPiano(){
 		e.style.zIndex = zIndex;
 		e.style.border = '1px solid #000000';
 		e.style.backgroundColor = backgroundColor;
+		e.style.color = color;
+		e.style.fontSize = '8px';
+		e.style.textAlign = 'center';
+		e.innerText = i.toString(10);
 
 		window.pianoElement.appendChild(e);
+		
+
 	}
 
 }
@@ -1021,7 +1049,7 @@ function createText(){
 	// 루프가 없을 때 제거이벤트
 	if(loopCheck == false){
 		s += '<event eventIndex="17"><param val="';
-		s += currentFrame;
+		s += Math.ceil(currentFrame);
 		s += '" key="offset"/><param val="';
 		s += loopFrame;
 		s += '" key="frames"/><event eventIndex="103"></event></event><param val="1" key="scale"/><param val="0" key="tileset"/>';
@@ -1155,7 +1183,7 @@ onload = function(){
 	for(let i = 0;i<window.instrumentList.length;i++){
 
 		if(i != 0 && i % window.instrumentRow == 0){
-			eBR = document.createElement('BR');
+			let eBR = document.createElement('BR');
 			document.getElementById('instrument').appendChild(eBR);
 		}
 
@@ -1177,7 +1205,12 @@ onload = function(){
 		eLabel.appendChild(eImg);
 		document.getElementById('instrument').appendChild(eLabel);
 	}
-
+	/*
+	let eBR = document.createElement('BR');
+	document.getElementById('instrument').appendChild(eBR);
+	let eLabel = document.createElement('LABEL');
+	let eInput = document.createElement('INPUT');
+	*/
 	//window.eToggleInstrument = document.getElementById('toggleCheck');
 
 	window.pianoElement = document.getElementById('PianoElement');
