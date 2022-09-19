@@ -1,4 +1,4 @@
-var instrumentList = [18, 19, 10, 3, 0, 4, 2, 20, 21]
+var instrumentList = [18, 19, 10, 3, 0, 4, 2, 20, 21, 29];
 var instrumentRow = 5;
 var instrumentImageData = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJGSURBVDhPtVRNa9RQFD1JXpKZsVVrF24sdSXqQnBTdaF1KaILLQou1O79CS4EF4L/QBcuLCpSmOIIg60MFQR/QleOOJ1m0k5lapL5SjL58L6XZNpxJVYPPJJz78vJvTfnRVpY+hzjH0BOr/vG/xFSFBn5fI6uCuI46TiX06HpmuB8aZoqYpIkiXyGoZAsy6itm3j+7A2q32oIohi9vofXr0r4UP6EGBIiWpXKFyy8LKLd7tEzu2JCKAhCIXR55iTW1r7i7KlpzM/N4tbV8zAbm/DdPu7fvIh5WgrJ1b4buDJ7Bla7L0Q4hFDSRoxD4wVIMsNYIQf+ssPEGWOitQy6pkFhKg5SLgh5jQnS1jiVMPB92DtNuJ4roiFtbFstdKyfgnO4XQfWzjZ1EaSRBCPDjmMf05PAkTFV8CiOMK72cWKqIDiHHHZweioHxkve48ChUEhvOHrsOF4svsW5CzMipigMDx4+wpOnjwXnuHRtDqWVJUxMTlDFYRr9rSKecGw7Zcnset1uyhJ41LZlOYio7eGACEKIW4KRPzSVQaWVQVWVEc6hqSp0ijHyHKOKMzHGjeV5HkrvPqJarWO9ZqBmtjAYBGKtlFdpVhD3OhnxfXEZRqOJA4UCKsuruHvvBlzXTyuiwUW0u2Fuo9WyUN/YgmE0xQOO3cZGel+vb8GmtszNHzDMprBGNm9x+vmRcJwOiotl6Hk96Z8nqVp+bLhhMzCmCK6Tt27fuY6AKuUY/ka4s3nyT8E/hOt6KdsjtF+MfP6/B/ALfln5Vj9HjXUAAAAASUVORK5CYII=',
@@ -12,6 +12,7 @@ var instrumentImageData = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAKySURBVDhPrZRbSBRhFMf/szOu42ppRq673hYStouYFoLVQw+GPqgUBT1UhBERRQVdoF6KQPAtfKugCPKpHlJJohtRZJaapq5BqWka4u6Wlut6wd2dmb7vzOzNpZ76wbBnzsf3n+87539WaGp+o+E/YDJ+EzAnmyGnJEOWjYfFkiQZq4kknMhkEpAkJaG15Tm83p/snX9LQDAURHl5KbaUbIKqKuyJv0hESBAECEykp9uFj72fUFe3H9UVWyGJLM/WfP5l3G5qQ/vbHtTUViA31wZFUUiEE3MiDYODw5DZlS6cPoD0VFlPr2B8ahZX6m+guHgDbLYsaJq+nWokiiI83mmMfBnF1UtH/irCcdgz0HDtDB63vWSf5jfR8yQUWA5g8rsHlZU7wMvZ/m4AM798fCmO3r4huD3TyLOuQvn2Ugx9/kqH4LBaClhYXML42ARO1tVS8uadZox+m6Q4lgesAf2uEYpPHduH9x29kU7q7WfHs6SYKeQcOrwH+fk5xluUmurdcG5cT3FmugzJHLVDxEexzazaVYLsdRmU63RNYHDYTfmdZU44crIopiLHbNKFWEJVVAo5kqing4Egzp1vwPXGu/QuMk+RrRghRYNqdIxj4rEkidDEJHQNjBlpHe4fR54VNutaIxPl6et+ZK5hpzbEyEe8YFNuLz6w4t2/V08L/yIQVFG19yyOnzhILudadFDu0DSLBZb01Wh50oXZhSBtWMlSQMH8sorGWw+xuchJ+8K3izhbZHVZZDbo7nTB+2MGly8eZZ2zR8YgmTm+9dErPHvRAUdBDraVFZFI3NUoYnAxv38BPp8ffWzefHPzVCeOwppRWFiA3Lxs2O1WGuawCCdOiMM38uLP/p5jEx/iFiN4h9JSLUixyAiFosMaJkEoDP0bhAfJQNPUSE3iAf4AlQQJTHPbUooAAAAASUVORK5CYII='
 ];
 var instrumentEnd = 30;
+var triggerNumber = 29;
 var instrumentColor = [];
 instrumentColor.push([197,29,52]);
 instrumentColor.push([132,195,190]);
@@ -22,6 +23,8 @@ instrumentColor.push([222,76,138]);
 instrumentColor.push([166,94,46]);
 instrumentColor.push([243,218,11]);
 instrumentColor.push([87,166,57]);
+instrumentColor.push([220,156,000]);
+var selectedInstrument = 0;
 
 var pitchBegin = 16;
 var pitchEnd = 68;
@@ -255,6 +258,7 @@ function NoteList(){
 	this.select = function(elem){
 		let pitch = parseInt(elem.getAttribute('pitch'));
 		let index = parseInt(elem.parentNode.parentNode.getAttribute('index'));
+		let currentCell = this.list[index].pitch[pitch];
 		/*
 		if(window.toggleCheck.checked == true){
 			if(window.pianoCheck.checked){
@@ -268,23 +272,19 @@ function NoteList(){
 			noteList.list[index].pitch[pitch].guitar = window.guitarCheck.checked;
 		}
 		*/
-		let exist = false;
-		for(let i=0;i<window.instrumentEnd;i++){
-			if(noteList.list[index].pitch[pitch][i] == true){
-				exist = true;
-				break;
-			}
-		}
-		if(exist == true){
-			for(let i=0;i<window.instrumentEnd;i++){
-				noteList.list[index].pitch[pitch][i] = false;
+		
+		if(document.getElementById('instrumentEraser').checked == true){
+			// 지우개가 활성화된 경우
+			for(let i=0;i<window.instrumentList.length;i++){
+				currentCell[instrumentList[i]] = false;
 			}
 		} else{
-			for(let i=0;i<window.instrumentEnd;i++){
-				if(eInstrument[i] != null){
-					noteList.list[index].pitch[pitch][i] = eInstrument[i].checked;
-				}
+			if(currentCell[window.selectedInstrument] == true){
+				currentCell[window.selectedInstrument] = false;
+			} else{
+				currentCell[window.selectedInstrument] = true;
 			}
+			
 		}
 		
 		this.color(elem, true);
@@ -692,7 +692,6 @@ function NoteList(){
 		
 		for(let i=window.pitchBegin;i<window.pitchEnd;i++){
 			for(let k=0;k<window.instrumentEnd;k++){
-				console.log(idx, i, k);
 				if(noteList.list[idx].pitch[i][k] == true){
 					window.soundManager.play(i);
 					break;
@@ -715,6 +714,13 @@ function NoteList(){
 		clearTimeout(window.musicTimer);
 	}
 
+	this.colorAll = function(){
+		let e = document.getElementById('NoteList').children;
+		for(let i=0;i<e.length;i++){
+			this.colorRow(e[i]);
+		}
+	}
+
 	this.colorRow = function(elem){
 		let e = elem.children[1].children;
 		for(let i=0;i<e.length;i++){
@@ -731,14 +737,26 @@ function NoteList(){
 		let g = 255;
 		let b = 255;
 		let instrumentNumber = 0;
-		for(let i=0;i<window.instrumentList.length;i++){
-			if(this.list[index].pitch[pitch][instrumentList[i]] == true){
-				r += instrumentColor[i][0];
-				g += instrumentColor[i][1];
-				b += instrumentColor[i][2];
+		if(document.getElementById('instrumentShowAll').checked == true){
+			// 모두 보여주기
+			for(let i=0;i<window.instrumentList.length;i++){
+				if(this.list[index].pitch[pitch][instrumentList[i]] == true){
+					r += instrumentColor[i][0];
+					g += instrumentColor[i][1];
+					b += instrumentColor[i][2];
+					instrumentNumber++;
+				}
+			}
+		} else{
+			if(this.list[index].pitch[pitch][window.selectedInstrument] == true){
+				
+				r += instrumentColor[instrumentList.indexOf(window.selectedInstrument)][0];
+				g += instrumentColor[instrumentList.indexOf(window.selectedInstrument)][1];
+				b += instrumentColor[instrumentList.indexOf(window.selectedInstrument)][2];
 				instrumentNumber++;
 			}
 		}
+		
 		
 		r %= 256;
 		g %= 256;
@@ -899,6 +917,7 @@ function createPiano(){
 		e.style.color = color;
 		e.style.fontSize = '8px';
 		e.style.textAlign = 'center';
+		e.style.overflow = 'hidden';
 		e.innerText = i.toString(10);
 
 		window.pianoElement.appendChild(e);
@@ -1013,6 +1032,7 @@ function createText(){
 			for(let k=0;k<window.instrumentList.length;k++){
 				let cInst = window.instrumentList[k];
 				if(noteList.list[i].pitch[j][cInst] == true){
+					// 해당 시각에서 처음 발동시 metronome tick 이벤트 생성
 					if(firstFound){
 						s += '<event eventIndex="17"><param val="';
 						s += Math.round(currentFrame); // 처음 발동할 프레임(반올림 하는게 맞을까?)
@@ -1027,14 +1047,23 @@ function createText(){
 						s += '" key="frames"/>';
 						firstFound = false;
 					}
-					s += '<event eventIndex="104"><param val="';
-					s += soundManager.toIWMPitch[j];
-					s += '" key="pitch"/><param val="';
-					s += cInst.toString(10); // 악기
-					s += '" key="sound"/></event>';
+
+					if(cInst == window.triggerNumber){
+						// 트리거인 경우 별도 처리
+						// activate trigger number (j)
+						s += '<event eventIndex="110"><param key="trigger_number" val="' + j.toString(10) + '"/></event>';
+					} else{
+						s += '<event eventIndex="104"><param val="';
+						s += soundManager.toIWMPitch[j];
+						s += '" key="pitch"/><param val="';
+						s += cInst.toString(10); // 악기
+						s += '" key="sound"/></event>';
+					}
+					
 				}
 			}
 		}
+		// metronome tick 이벤트 종료
 		if(firstFound == false){
 			s += '</event>';
 		}
@@ -1192,25 +1221,82 @@ onload = function(){
 		let eLabel = document.createElement('LABEL');
 		let eInput = document.createElement('INPUT');
 		eInput.setAttribute('id', 'instrument' + code.toString(10));
-		eInput.setAttribute('type', 'checkbox');
+		eInput.setAttribute('name', 'inst');
+		eInput.setAttribute('type', 'radio');
 		if(i == 0){
-			eInput.setAttribute('checked', 'checked')
+			eInput.setAttribute('checked', 'checked');
+			window.selectedInstrument = code;
 		}
-		let eImg = document.createElement('IMG')
-		eImg.setAttribute('src', window.instrumentImageData[i])
 
+		let eImg;
+		if(code == window.triggerNumber){
+			eImg = document.createElement('DIV');
+			eImg.style.display = 'inline';
+			eImg.innerText = 'Trigger';
+			eImg.title = 'Activate Trigger numbered in piano keyboard(' + window.pitchBegin.toString(10) + '-' + (window.pitchEnd - 1).toString(10) + ')';
+		} else{
+			eImg = document.createElement('IMG');
+			eImg.setAttribute('src', window.instrumentImageData[i]);
+		}
+		
 		eInstrument[code] = eInput;
 
 		eLabel.appendChild(eInput);
 		eLabel.appendChild(eImg);
+
+		eLabel.onclick = function(e){
+			window.selectedInstrument = code;
+			noteList.colorAll();
+		}
+
 		document.getElementById('instrument').appendChild(eLabel);
 	}
-	/*
+
+	
+	
+	// show all checkbox
 	let eBR = document.createElement('BR');
 	document.getElementById('instrument').appendChild(eBR);
 	let eLabel = document.createElement('LABEL');
+	eLabel.style.display = 'inline';
 	let eInput = document.createElement('INPUT');
-	*/
+	eInput.setAttribute('id', 'instrumentShowAll');
+	eInput.setAttribute('type', 'checkbox');
+	eInput.checked = 'checked';
+
+	let eText = document.createElement('DIV');
+	eText.style.display = 'inline';
+	eText.innerText = 'show all ';
+
+	eLabel.appendChild(eInput);
+	eLabel.appendChild(eText);
+
+	eLabel.onclick = function(e){
+		noteList.colorAll();
+	}
+
+	document.getElementById('instrument').appendChild(eLabel);
+	
+
+
+	// eraser checkbox
+	eLabel = document.createElement('LABEL');
+	eLabel.style.display = 'inline';
+	eInput = document.createElement('INPUT');
+	eInput.setAttribute('id', 'instrumentEraser');
+	eInput.setAttribute('type', 'checkbox');
+
+	eText = document.createElement('DIV');
+	eText.style.display = 'inline';
+	eText.innerText = 'eraser ';
+
+	eLabel.appendChild(eInput);
+	eLabel.appendChild(eText);
+
+	document.getElementById('instrument').appendChild(eLabel);
+	
+
+
 	//window.eToggleInstrument = document.getElementById('toggleCheck');
 
 	window.pianoElement = document.getElementById('PianoElement');
